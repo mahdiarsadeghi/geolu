@@ -1,5 +1,5 @@
 /**
- * Aureus - Where Algorithms Predict Value
+ * Geolu - Where Algorithms Predict Value
  * Copyright (c) 2026 Mahdiar Sadeghi
  * Licensed under Proprietary License with Educational Use
  * See LICENSE file for full terms

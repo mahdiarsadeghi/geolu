@@ -25,18 +25,24 @@ header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 40px 30px;
-    text-align: center;
+}
+
+.header-content {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
 }
 
 header h1 {
     font-size: 2.5em;
-    margin-bottom: 10px;
+    margin: 0;
     font-weight: 700;
 }
 
 .subtitle {
     font-size: 1.1em;
     opacity: 0.9;
+    margin: 0;
 }
 
 .status-bar {
@@ -184,6 +190,11 @@ footer a:hover {
 }
 
 @media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
     header h1 {
         font-size: 2em;
     }

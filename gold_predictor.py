@@ -1,5 +1,5 @@
 """
-Aureus - Where Algorithms Predict Value
+Geolu - Where Algorithms Predict Value
 Predicts gold prices weekly and logs predictions over time.
 Supports multiple models for comparison and accuracy evaluation.
 

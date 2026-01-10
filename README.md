@@ -1,11 +1,11 @@
-# Aureus 📈
+# Geolu
 *Where Algorithms Predict Value*
 
 A sophisticated predictive analytics system that forecasts gold prices weekly using multiple ML models and visualizes results through an elegant web interface.
 
 ## 🌐 Live Dashboard
 
-**View the live predictions:** [https://mahdiarsadeghi.github.io/gold/](https://mahdiarsadeghi.github.io/gold/)
+**View the live predictions:** [https://mahdiarsadeghi.github.io/geolu/](https://mahdiarsadeghi.github.io/geolu/)
 
 ## Features
 
@@ -192,7 +192,7 @@ For commercial licensing inquiries, contact [@mahdiarsadeghi](https://github.com
 
 ## Author
 
-**Aureus** was created by Mahdiar Sadeghi as an intelligent predictive analytics system for financial markets, starting with gold price forecasting.
+**Geolu** was created by Mahdiar Sadeghi as an intelligent predictive analytics system for financial markets, starting with gold price forecasting.
 
 ## Future Enhancements
 
