@@ -1,3 +1,10 @@
+/**
+ * Aureus - Where Algorithms Predict Value
+ * Copyright (c) 2026 Mahdiar Sadeghi
+ * Licensed under Proprietary License with Educational Use
+ * See LICENSE file for full terms
+ */
+
 // Global variables
 let priceChart = null;
 
@@ -20,7 +27,7 @@ async function loadData() {
 // Update status bar
 function updateStatusBar(data) {
     document.getElementById('last-updated').textContent = formatDateTime(data.last_updated);
-    document.getElementById('current-price').textContent = `$${data.current_price.toFixed(2)}`;
+    document.getElementById('current-price').textContent = `$${data.current_price.toFixed(2)} USD/oz`;
     document.getElementById('target-date').textContent = formatDate(data.target_date);
 }
 

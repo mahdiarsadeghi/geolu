@@ -1,6 +1,7 @@
-# Gold Price Predictor 📈
+# Aureus 📈
+*Where Algorithms Predict Value*
 
-A Python-based gold price prediction system that automatically forecasts gold prices weekly using multiple ML models and visualizes results through a minimal web interface.
+A sophisticated predictive analytics system that forecasts gold prices weekly using multiple ML models and visualizes results through an elegant web interface.
 
 ## 🌐 Live Dashboard
 
@@ -175,11 +176,23 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT License - feel free to use this project for your own purposes.
+**Proprietary License with Educational Use**
+
+This project is protected under a custom license that:
+- ✅ **Allows** educational, personal, and research use (FREE)
+- ✅ **Allows** academic teaching and non-commercial study
+- ❌ **Restricts** commercial use without permission
+- ❌ **Protects** algorithms and predictive methodologies from commercial exploitation
+
+The algorithms, predictive models, and evaluation techniques in this repository are proprietary intellectual property.
+
+**Commercial use requires permission.** See [LICENSE](LICENSE) for full terms.
+
+For commercial licensing inquiries, contact [@mahdiarsadeghi](https://github.com/mahdiarsadeghi).
 
 ## Author
 
-Created as an automated gold price prediction and logging system.
+**Aureus** was created by Mahdiar Sadeghi as an intelligent predictive analytics system for financial markets, starting with gold price forecasting.
 
 ## Future Enhancements
 

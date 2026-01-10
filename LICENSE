@@ -1,0 +1,92 @@
+Aureus - Proprietary License with Educational Use
+
+Copyright (c) 2026 Mahdiar Sadeghi
+
+TERMS AND CONDITIONS
+
+1. DEFINITIONS
+   "Software" refers to Aureus (the predictive analytics repository), including all code, 
+   algorithms, predictive models, methodologies, and evaluation techniques.
+   
+   "Algorithms" specifically includes but is not limited to the machine learning 
+   implementations, feature engineering techniques, prediction methodologies, and 
+   model evaluation frameworks contained in this repository.
+
+2. GRANT OF LICENSE
+
+   2.1 Educational and Personal Use
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this Software for EDUCATIONAL and PERSONAL, NON-COMMERCIAL purposes only,
+   subject to the following conditions:
+
+   a) The Software may be used for learning, research, and personal experimentation
+   b) Academic institutions may use the Software for teaching purposes
+   c) Attribution must be given to the original author in any educational materials
+
+   2.2 Restrictions on Commercial Use
+   Any COMMERCIAL use of this Software, including but not limited to:
+   - Use in production trading systems
+   - Integration into commercial financial services
+   - Sale or licensing of derivative predictive models
+   - Use in for-profit consulting or advisory services
+   
+   REQUIRES prior written permission from the copyright holder.
+
+3. PROTECTION OF ALGORITHMS AND PREDICTIVE MODELS
+
+   3.1 The mathematical algorithms, predictive methodologies, feature 
+   numerical techniques, and evaluation frameworks contained in this 
+   Software are proprietary intellectual property.
+
+   3.2 You may NOT:
+   - Extract, copy, or replicate the algorithms for use in other commercial projects
+   - Create derivative predictive models based on these methodologies for commercial sale
+   - Claim the algorithms or methodologies as your own work
+   - Remove or modify attribution and copyright notices
+
+   3.3 You MAY:
+   - Study the algorithms for educational purposes
+   - Reference the methodologies in academic papers with proper citation
+   - Create non-commercial derivative works for personal learning
+
+4. ATTRIBUTION REQUIREMENTS
+
+   Any use, distribution, or derivative work must include:
+   
+   "This work uses prediction methodologies from Aureus
+   by Mahdiar Sadeghi (https://github.com/mahdiarsadeghi/gold)"
+
+5. NO WARRANTY
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+6. FINANCIAL DISCLAIMER
+
+   This Software is for EDUCATIONAL and INFORMATIONAL purposes only. It is NOT
+   intended to provide financial, investment, or trading advice. Past performance
+   does not guarantee future results. Users assume all risks associated with any
+   financial decisions based on predictions from this Software.
+
+7. CONTACT FOR COMMERCIAL LICENSING
+
+   For commercial licensing inquiries, please contact:
+   GitHub: @mahdiarsadeghi
+   Repository: https://github.com/mahdiarsadeghi/gold
+
+8. TERMINATION
+
+   This license automatically terminates if you violate any of these terms.
+   Upon termination, you must destroy all copies of the Software in your possession.
+
+9. GOVERNING LAW
+
+   This license shall be governed by and construed in accordance with applicable
+   copyright and intellectual property laws.
+
+Last Updated: January 10, 2026

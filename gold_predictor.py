@@ -1,7 +1,14 @@
 """
-Gold Price Predictor
+Aureus - Where Algorithms Predict Value
 Predicts gold prices weekly and logs predictions over time.
 Supports multiple models for comparison and accuracy evaluation.
+
+Copyright (c) 2026 Mahdiar Sadeghi
+Licensed under Proprietary License with Educational Use
+See LICENSE file for terms and conditions.
+
+The algorithms and predictive methodologies in this software are proprietary.
+Commercial use requires permission from the copyright holder.
 """
 
 import pandas as pd
@@ -120,11 +127,13 @@ class GoldPricePredictor:
         # Make predictions with all models
         predictions = {}
         for model_name, model in self.models.items():
-            predicted_price = model.predict(X_pred)[0]
+            pred_result = model.predict(X_pred)
+            # Extract scalar value from numpy array
+            predicted_price = float(pred_result.item() if hasattr(pred_result, 'item') else pred_result[0])
             price_change_percent = ((predicted_price - current_price) / current_price) * 100
             
             predictions[model_name] = {
-                'predicted_price': float(predicted_price),
+                'predicted_price': predicted_price,
                 'price_change_percent': float(price_change_percent)
             }
         
@@ -141,7 +150,7 @@ class GoldPricePredictor:
         recent_data = df.tail(days)[['Close']].copy()
         return {
             'dates': [d.strftime('%Y-%m-%d') for d in recent_data.index],
-            'prices': [float(p) for p in recent_data['Close'].values]
+            'prices': [float(p.item()) if hasattr(p, 'item') else float(p) for p in recent_data['Close'].values]
         }
     
     def log_prediction(self, prediction):
