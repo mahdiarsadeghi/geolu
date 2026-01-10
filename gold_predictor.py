@@ -1,14 +1,16 @@
 """
 Gold Price Predictor
 Predicts gold prices weekly and logs predictions over time.
+Supports multiple models for comparison and accuracy evaluation.
 """
 
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import yfinance as yf
-from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.svm import SVR
 import json
 import os
 import warnings
@@ -16,11 +18,13 @@ warnings.filterwarnings('ignore')
 
 
 class GoldPricePredictor:
-    def __init__(self, log_file='predictions_log.json'):
+    def __init__(self, log_file='predictions_log.json', web_data_file='docs/data.json'):
         """Initialize the gold price predictor."""
         self.log_file = log_file
+        self.web_data_file = web_data_file
         self.gold_ticker = 'GC=F'  # Gold futures ticker
-        self.model = None
+        self.models = {}
+        self.predictions = {}
         
     def fetch_gold_data(self, period='2y'):
         """Fetch historical gold price data."""
@@ -67,9 +71,19 @@ class GoldPricePredictor:
         
         return X, y, feature_columns
     
-    def train_model(self):
-        """Train the prediction model."""
-        print("Training prediction model...")
+    def initialize_models(self):
+        """Initialize multiple prediction models."""
+        self.models = {
+            'Random Forest': RandomForestRegressor(n_estimators=100, random_state=42, max_depth=10),
+            'Linear Regression': LinearRegression(),
+            'Ridge Regression': Ridge(alpha=1.0),
+            'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, random_state=42),
+            'SVR': SVR(kernel='rbf', C=100, gamma=0.1)
+        }
+    
+    def train_models(self):
+        """Train all prediction models."""
+        print("Training prediction models...")
         
         # Fetch data
         gold_data = self.fetch_gold_data(period='2y')
@@ -80,40 +94,54 @@ class GoldPricePredictor:
         # Prepare training data
         X, y, feature_columns = self.prepare_training_data(df_features)
         
-        # Train Random Forest model
-        self.model = RandomForestRegressor(n_estimators=100, random_state=42, max_depth=10)
-        self.model.fit(X, y)
+        # Initialize models
+        self.initialize_models()
         
-        print("Model training completed!")
-        return df_features
+        # Train all models
+        for model_name, model in self.models.items():
+            model.fit(X, y)
+            print(f"  ✓ {model_name} trained")
+        
+        print("All models training completed!")
+        return df_features, feature_columns
     
     def predict_next_week(self):
-        """Make prediction for next week's gold price."""
-        # Train model with latest data
-        df_features = self.train_model()
+        """Make predictions for next week's gold price using all models."""
+        # Train models with latest data
+        df_features, feature_columns = self.train_models()
         
         # Get the most recent data point for prediction
         latest_features = df_features.iloc[-1]
-        feature_columns = ['MA_7', 'MA_30', 'MA_90', 'Volatility', 
-                          'Daily_Return', 'Price_Change', 'RSI']
-        
         X_pred = latest_features[feature_columns].values.reshape(1, -1)
-        
-        # Make prediction
-        predicted_price = self.model.predict(X_pred)[0]
         
         # Get current price
         current_price = df_features['Close'].iloc[-1]
         
-        # Calculate prediction confidence (simplified)
-        price_change_percent = ((predicted_price - current_price) / current_price) * 100
+        # Make predictions with all models
+        predictions = {}
+        for model_name, model in self.models.items():
+            predicted_price = model.predict(X_pred)[0]
+            price_change_percent = ((predicted_price - current_price) / current_price) * 100
+            
+            predictions[model_name] = {
+                'predicted_price': float(predicted_price),
+                'price_change_percent': float(price_change_percent)
+            }
         
         return {
             'current_price': float(current_price),
-            'predicted_price': float(predicted_price),
-            'price_change_percent': float(price_change_percent),
+            'predictions': predictions,
             'prediction_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'target_date': (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
+            'target_date': (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d'),
+            'historical_data': self.get_recent_historical_data(df_features)
+        }
+    
+    def get_recent_historical_data(self, df, days=30):
+        """Get recent historical data for visualization."""
+        recent_data = df.tail(days)[['Close']].copy()
+        return {
+            'dates': [d.strftime('%Y-%m-%d') for d in recent_data.index],
+            'prices': [float(p) for p in recent_data['Close'].values]
         }
     
     def log_prediction(self, prediction):
@@ -143,29 +171,58 @@ class GoldPricePredictor:
     
     def display_prediction(self, prediction):
         """Display prediction in a formatted way."""
-        print("\n" + "="*60)
-        print("GOLD PRICE PREDICTION")
-        print("="*60)
+        print("\n" + "="*70)
+        print("GOLD PRICE PREDICTIONS - MULTI-MODEL COMPARISON")
+        print("="*70)
         print(f"Prediction Date: {prediction['prediction_date']}")
         print(f"Target Date: {prediction['target_date']}")
         print(f"Current Price: ${prediction['current_price']:.2f}")
-        print(f"Predicted Price (1 week): ${prediction['predicted_price']:.2f}")
-        print(f"Expected Change: {prediction['price_change_percent']:+.2f}%")
-        print("="*60 + "\n")
+        print("-"*70)
+        print(f"{'Model':<25} {'Predicted Price':>15} {'Change':>12}")
+        print("-"*70)
+        
+        for model_name, pred in prediction['predictions'].items():
+            print(f"{model_name:<25} ${pred['predicted_price']:>14.2f} {pred['price_change_percent']:>11.2f}%")
+        
+        print("="*70 + "\n")
+    
+    def export_web_data(self, prediction):
+        """Export data for web visualization."""
+        # Ensure docs directory exists
+        os.makedirs(os.path.dirname(self.web_data_file), exist_ok=True)
+        
+        # Prepare web data
+        web_data = {
+            'last_updated': prediction['prediction_date'],
+            'current_price': prediction['current_price'],
+            'target_date': prediction['target_date'],
+            'historical': prediction['historical_data'],
+            'predictions': prediction['predictions'],
+            'prediction_history': self.get_prediction_history()
+        }
+        
+        # Save web data
+        with open(self.web_data_file, 'w') as f:
+            json.dump(web_data, f, indent=2)
+        
+        print(f"Web data exported to {self.web_data_file}")
     
     def run_weekly_prediction(self):
         """Run the weekly prediction routine."""
         print("Starting Gold Price Weekly Prediction...")
         print(f"Current Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
         
-        # Make prediction
+        # Make predictions with all models
         prediction = self.predict_next_week()
         
-        # Display prediction
+        # Display predictions
         self.display_prediction(prediction)
         
         # Log prediction
         self.log_prediction(prediction)
+        
+        # Export data for web visualization
+        self.export_web_data(prediction)
         
         # Show prediction count
         history = self.get_prediction_history()
@@ -182,12 +239,17 @@ def main():
     # Display recent prediction history
     history = predictor.get_prediction_history()
     if len(history) > 1:
-        print("\nRecent Prediction History (Last 5):")
-        print("-" * 60)
-        for pred in history[-5:]:
-            print(f"{pred['prediction_date']} | Current: ${pred['current_price']:.2f} | "
-                  f"Predicted: ${pred['predicted_price']:.2f} | "
-                  f"Change: {pred['price_change_percent']:+.2f}%")
+        print("\nRecent Prediction History (Last 3):")
+        print("-" * 70)
+        for pred in history[-3:]:
+            print(f"\n{pred['prediction_date']} | Target: {pred['target_date']}")
+            print(f"Current Price: ${pred['current_price']:.2f}")
+            if 'predictions' in pred:
+                for model, data in pred['predictions'].items():
+                    print(f"  {model}: ${data['predicted_price']:.2f} ({data['price_change_percent']:+.2f}%)")
+            else:
+                # Legacy format support
+                print(f"  Predicted: ${pred.get('predicted_price', 0):.2f} ({pred.get('price_change_percent', 0):+.2f}%)")
 
 
 if __name__ == "__main__":

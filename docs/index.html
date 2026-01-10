@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gold Price Predictor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📈 Gold Price Predictor</h1>
+            <p class="subtitle">Weekly predictions using multiple ML models</p>
+        </header>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="label">Last Updated:</span>
+                <span id="last-updated">Loading...</span>
+            </div>
+            <div class="status-item">
+                <span class="label">Current Price:</span>
+                <span id="current-price" class="price">$0.00</span>
+            </div>
+            <div class="status-item">
+                <span class="label">Target Date:</span>
+                <span id="target-date">Loading...</span>
+            </div>
+        </div>
+
+        <section class="chart-section">
+            <h2>Historical Prices & Predictions</h2>
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
+        </section>
+
+        <section class="predictions-section">
+            <h2>Model Predictions (Next Week)</h2>
+            <div id="predictions-grid" class="predictions-grid">
+                <div class="loading">Loading predictions...</div>
+            </div>
+        </section>
+
+        <section class="accuracy-section">
+            <h2>Model Performance History</h2>
+            <p class="note">Tracking prediction accuracy over time (coming soon)</p>
+            <div id="accuracy-info">
+                <p>Prediction history will be evaluated once sufficient data is collected.</p>
+            </div>
+        </section>
+
+        <footer>
+            <p>⚠️ For educational purposes only. Not financial advice.</p>
+            <p><a href="https://github.com/mahdiarsadeghi/gold" target="_blank">View on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

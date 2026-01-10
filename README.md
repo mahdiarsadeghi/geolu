@@ -1,14 +1,20 @@
 # Gold Price Predictor 📈
 
-A Python-based gold price prediction system that automatically forecasts gold prices weekly and maintains a comprehensive log of all predictions over time.
+A Python-based gold price prediction system that automatically forecasts gold prices weekly using multiple ML models and visualizes results through a minimal web interface.
+
+## 🌐 Live Dashboard
+
+**View the live predictions:** [https://mahdiarsadeghi.github.io/gold/](https://mahdiarsadeghi.github.io/gold/)
 
 ## Features
 
 - 🔮 **Weekly Price Predictions**: Automatically predicts gold prices for the upcoming week
-- 📊 **Machine Learning Model**: Uses Random Forest algorithm with multiple technical indicators
+- 🤖 **Multiple ML Models**: Compares 5 different algorithms (Random Forest, Linear Regression, Ridge, Gradient Boosting, SVR)
+- 📊 **Interactive Web Dashboard**: Minimal, beautiful visualization of predictions and historical data
 - 📝 **Prediction Logging**: Maintains a complete history of all predictions in JSON format
 - 📈 **Technical Indicators**: Incorporates Moving Averages, RSI, Volatility, and momentum indicators
 - 🎯 **Real-time Data**: Fetches live gold price data using Yahoo Finance API
+- 📉 **Model Comparison**: Track and compare accuracy of different models over time
 
 ## Installation
 
@@ -75,46 +81,74 @@ All predictions are automatically saved to `predictions_log.json`. You can:
 - **RSI (Relative Strength Index)**: 14-period RSI for momentum
 - **Price Changes**: Absolute price differences
 
-### Model
+### Models
 
-- **Algorithm**: Random Forest Regressor
-- **Training Data**: 2 years of historical gold price data
-- **Data Source**: Yahoo Finance (GC=F - Gold Futures)
+The predictor uses 5 different ML algorithms for comparison:
+
+1. **Random Forest Regressor** - Ensemble method with 100 decision trees
+2. **Linear Regression** - Simple linear model for baseline comparison
+3. **Ridge Regression** - L2 regularized linear model
+4. **Gradient Boosting** - Sequential ensemble method
+5. **Support Vector Regression (SVR)** - Non-linear kernel-based model
+
+**Training Data**: 2 years of historical gold price data  
+**Data Source**: Yahoo Finance (GC=F - Gold Futures)
 
 ## Output Format
 
-Each prediction includes:
-- Current gold price
-- Predicted price for next week
-- Percentage change expected
-- Prediction timestamp
-- Target date
+Each prediction includes predictions from all 5 models:
 
-Example output:
 ```
-============================================================
-GOLD PRICE PREDICTION
-============================================================
+======================================================================
+GOLD PRICE PREDICTIONS - MULTI-MODEL COMPARISON
+======================================================================
 Prediction Date: 2026-01-10 14:30:00
 Target Date: 2026-01-17
 Current Price: $2045.50
-Predicted Price (1 week): $2067.30
-Expected Change: +1.07%
-============================================================
+----------------------------------------------------------------------
+Model                     Predicted Price       Change
+----------------------------------------------------------------------
+Random Forest                      $2067.30       +1.07%
+Linear Regression                  $2055.20       +0.47%
+Ridge Regression                   $2058.40       +0.63%
+Gradient Boosting                  $2071.80       +1.29%
+SVR                                $2062.10       +0.81%
+======================================================================
 ```
+
+## Web Dashboard
+
+The project includes a minimal, beautiful web interface that displays:
+
+- **Historical Price Chart**: 30-day price history with smooth visualization
+- **Model Predictions**: All 5 models' predictions with color-coded changes
+- **Live Status**: Current price, last update time, and target date
+- **Interactive Charts**: Built with Chart.js for responsive, modern visualization
+
+The dashboard automatically updates when you run new predictions.
 
 ## Prediction Log Structure
 
 ```json
-[
-  {
-    "current_price": 2045.50,
-    "predicted_price": 2067.30,
-    "price_change_percent": 1.07,
-    "prediction_date": "2026-01-10 14:30:00",
-    "target_date": "2026-01-17"
+{
+  "current_price": 2045.50,
+  "predictions": {
+    "Random Forest": {
+      "predicted_price": 2067.30,
+      "price_change_percent": 1.07
+    },
+    "Linear Regression": {
+      "predicted_price": 2055.20,
+      "price_change_percent": 0.47
+    }
+  },
+  "prediction_date": "2026-01-10 14:30:00",
+  "target_date": "2026-01-17",
+  "historical_data": {
+    "dates": ["2025-12-11", "..."],
+    "prices": [2040.20, "..."]
   }
-]
+}
 ```
 
 ## Requirements
@@ -149,12 +183,15 @@ Created as an automated gold price prediction and logging system.
 
 ## Future Enhancements
 
+- [x] Multiple ML models for comparison
+- [x] Web dashboard with Chart.js visualization
+- [ ] Model accuracy tracking and evaluation
 - [ ] Add sentiment analysis from news sources
-- [ ] Implement ensemble models
-- [ ] Create web dashboard for visualization
-- [ ] Add email notifications for predictions
-- [ ] Include prediction accuracy metrics
+- [ ] Email/SMS notifications for predictions
+- [ ] Include prediction confidence intervals
 - [ ] Add support for other precious metals
+- [ ] Automated GitHub Actions for weekly runs
+- [ ] Historical accuracy metrics dashboard
 
 ---
 

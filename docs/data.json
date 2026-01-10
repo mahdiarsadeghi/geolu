@@ -1,0 +1,11 @@
+{
+  "last_updated": "2026-01-10 00:00:00",
+  "current_price": 2050.0,
+  "target_date": "2026-01-17",
+  "historical": {
+    "dates": [],
+    "prices": []
+  },
+  "predictions": {},
+  "prediction_history": []
+}
