@@ -343,9 +343,36 @@ function createPredictionsChart(data, period = 'weekly') {
             borderDash: [5, 5],
             pointRadius: 0,
             pointHoverRadius: 0,
-            tension: 0.4
+            tension: 0.4,
+            yAxisID: assetName.replace(/[^a-zA-Z0-9]/g, '')
         });
     }
+    
+    // Create y-axes configuration for each asset (same as historical chart)
+    const yAxes = {};
+    assetNames.forEach((assetName, index) => {
+        const axisId = assetName.replace(/[^a-zA-Z0-9]/g, '');
+        const isRightSide = index % 2 === 1;
+        yAxes[axisId] = {
+            type: 'linear',
+            display: true,
+            position: isRightSide ? 'right' : 'left',
+            grid: {
+                drawOnChartArea: index === 0,
+            },
+            title: {
+                display: true,
+                text: assetName,
+                color: colors[assetName] || '#667eea'
+            },
+            ticks: {
+                color: colors[assetName] || '#667eea',
+                callback: function(value) {
+                    return '$' + value.toLocaleString();
+                }
+            }
+        };
+    });
     
     if (typeof Chart === 'undefined') {
         console.error('Chart.js library not loaded');
@@ -367,24 +394,15 @@ function createPredictionsChart(data, period = 'weekly') {
                     intersect: false
                 },
                 plugins: {
-                    title: {
-                        display: true,
-                        text: 'Predicted Trends (Smoothed)',
-                        position: 'top',
-                        font: {
-                            size: 13,
-                            weight: 'bold'
-                        },
-                        color: '#2d3748'
-                    },
                     legend: {
                         display: true,
-                        position: 'bottom',
+                        position: 'top',
                         labels: {
                             usePointStyle: true,
-                            padding: 10,
+                            padding: 15,
                             font: {
-                                size: 10
+                                size: 12,
+                                weight: 'bold'
                             }
                         }
                     },
@@ -407,19 +425,16 @@ function createPredictionsChart(data, period = 'weekly') {
                     }
                 },
                 scales: {
-                    y: {
-                        beginAtZero: false,
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + value.toLocaleString();
-                            }
-                        }
-                    },
+                    ...yAxes,
                     x: {
                         ticks: {
                             maxRotation: 45,
                             minRotation: 45,
-                            maxTicksLimit: 6
+                            maxTicksLimit: 7
+                        },
+                        title: {
+                            display: true,
+                            text: 'Date'
                         }
                     }
                 }
