@@ -26,12 +26,9 @@ async function loadData() {
         updateStatusBar(data);
         createHistoricalChart(data, currentPeriod);
         createPredictionsChart(data, currentPeriod);
-        displayPredictions(data);
         setupTabListeners();
     } catch (error) {
         console.error('Error loading data:', error);
-        document.getElementById('predictions-content').innerHTML = 
-            '<div class="loading">Error loading data. Please run the predictor first.</div>';
     }
 }
 
