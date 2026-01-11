@@ -146,16 +146,13 @@ function createHistoricalChart(data, period = 'weekly') {
             title: {
                 display: true,
                 text: assetName,
-                color: colors[assetName] || '#667eea',
-                align: isRightSide ? 'end' : 'start'
+                color: colors[assetName] || '#667eea'
             },
             ticks: {
                 color: colors[assetName] || '#667eea',
                 callback: function(value) {
                     return '$' + value.toLocaleString();
-                },
-                autoSkip: true,
-                maxTicksLimit: 8
+                }
             }
         };
     });
