@@ -23,19 +23,18 @@
 
         <div class="status-bar">
             <p>Last Updated: <span id="last-updated">Loading...</span></p>
+            <div class="frequency-selector">
+                <span class="frequency-label">Frequency:</span>
+                <button class="tab-button active" data-period="weekly">Weekly</button>
+                <button class="tab-button" data-period="monthly">Monthly</button>
+                <button class="tab-button" data-period="yearly">Yearly</button>
+            </div>
         </div>
 
         <section class="main-section">
             <div class="two-column-layout">
                 <div class="left-column">
-                    <div class="chart-header">
-                        <h2>Historical Prices</h2>
-                        <div class="time-tabs">
-                            <button class="tab-button active" data-period="weekly">Weekly</button>
-                            <button class="tab-button" data-period="monthly">Monthly</button>
-                            <button class="tab-button" data-period="yearly">Yearly</button>
-                        </div>
-                    </div>
+                    <h2>Historical Prices</h2>
                     <div class="chart-container">
                         <canvas id="historicalChart"></canvas>
                     </div>

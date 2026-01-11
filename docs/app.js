@@ -135,23 +135,26 @@ function createHistoricalChart(data, period = 'weekly') {
     const yAxes = {};
     assetNames.forEach((assetName, index) => {
         const axisId = assetName.replace(/[^a-zA-Z0-9]/g, '');
+        const isRightSide = index % 2 === 1;
         yAxes[axisId] = {
             type: 'linear',
             display: true,
-            position: index % 2 === 0 ? 'left' : 'right',
+            position: isRightSide ? 'right' : 'left',
             grid: {
                 drawOnChartArea: index === 0, // Only show grid for first axis
             },
             title: {
                 display: true,
                 text: assetName,
-                color: colors[assetName] || '#667eea'
+                color: colors[assetName] || '#667eea',
+                padding: isRightSide ? { left: 10, right: 5 } : { left: 5, right: 10 }
             },
             ticks: {
                 color: colors[assetName] || '#667eea',
                 callback: function(value) {
                     return '$' + value.toLocaleString();
-                }
+                },
+                padding: isRightSide ? 10 : 5
             }
         };
     });
