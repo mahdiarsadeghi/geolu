@@ -35,8 +35,10 @@ async function loadData() {
 // Setup tab button listeners
 function setupTabListeners() {
     const tabButtons = document.querySelectorAll('.tab-button');
+    console.log('Setting up tab listeners, found', tabButtons.length, 'buttons');
     tabButtons.forEach(button => {
         button.addEventListener('click', function() {
+            console.log('Button clicked:', this.getAttribute('data-period'));
             // Remove active class from all buttons
             tabButtons.forEach(btn => btn.classList.remove('active'));
             // Add active class to clicked button
@@ -302,7 +304,8 @@ function createPredictionsChart(data, period = 'weekly') {
     // Get prediction data for the selected period
     const predictionsData = data.predictions_data?.[period];
     if (!predictionsData) {
-        console.error('No predictions data available');
+        console.error('No predictions data available for period:', period);
+        console.log('Available data:', data);
         return;
     }
     
@@ -443,6 +446,7 @@ function createPredictionsChart(data, period = 'weekly') {
         console.log('Predictions chart created successfully');
     } catch (error) {
         console.error('Error creating predictions chart:', error);
+        console.error('Error details:', error.message, error.stack);
     }
 }
 
