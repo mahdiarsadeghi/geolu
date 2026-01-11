@@ -13,8 +13,13 @@ let currentPeriod = 'weekly';
 // Fetch and display data
 async function loadData() {
     try {
+        console.log('Loading data...');
         const response = await fetch('data.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
+        console.log('Data loaded successfully:', data);
         chartData = data;
         
         updateStatusBar(data);
@@ -51,7 +56,18 @@ function updateStatusBar(data) {
 
 // Create historical prices chart for multiple assets
 function createHistoricalChart(data, period = 'weekly') {
-    const ctx = document.getElementById('historicalChart').getContext('2d');
+    console.log('Creating chart for period:', period);
+    const canvas = document.getElementById('historicalChart');
+    if (!canvas) {
+        console.error('Canvas element not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Could not get canvas context');
+        return;
+    }
     
     // Destroy existing chart if it exists
     if (historicalChart) {
@@ -72,6 +88,8 @@ function createHistoricalChart(data, period = 'weekly') {
         console.error('No asset data available');
         return;
     }
+    
+    console.log('Data source:', dataSource);
     
     // Colors for each asset
     const colors = {
@@ -138,19 +156,25 @@ function createHistoricalChart(data, period = 'weekly') {
         };
     });
     
-    historicalChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: allDates,
-            datasets: datasets
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-                mode: 'index',
-                intersect: false
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js library not loaded');
+        return;
+    }
+    
+    try {
+        historicalChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: allDates,
+                datasets: datasets
             },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
             plugins: {
                 title: {
                     display: true,
@@ -213,6 +237,10 @@ function createHistoricalChart(data, period = 'weekly') {
             }
         }
     });
+    console.log('Chart created successfully');
+    } catch (error) {
+        console.error('Error creating chart:', error);
+    }
 }
 
 // Display predictions in right column
