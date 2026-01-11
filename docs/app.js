@@ -148,6 +148,7 @@ function createHistoricalChart(data, period = 'weekly') {
                 display: true,
                 text: assetName,
                 color: colors[assetName] || '#667eea',
+                align: isRightSide ? 'end' : 'start',
                 padding: {
                     top: 0,
                     bottom: 5
@@ -158,7 +159,7 @@ function createHistoricalChart(data, period = 'weekly') {
                 callback: function(value) {
                     return '$' + value.toLocaleString();
                 },
-                padding: isRightSide ? 15 : 5,
+                padding: 5,
                 autoSkip: true,
                 maxTicksLimit: 6
             },
