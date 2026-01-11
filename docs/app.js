@@ -1,6 +1,6 @@
 /**
  * Geolu - Where Algorithms Predict Value
- * Copyright (c) 2026 Mahdiar Sadeghi
+ * Copyright (c) 2026 Geolu
  * Licensed under Proprietary License with Educational Use
  * See LICENSE file for full terms
  */
@@ -325,9 +325,24 @@ function createPredictionsChart(data, period = 'weekly') {
         predictionsChart.destroy();
     }
     
-    // Get prediction data for the selected period
-    const predictionsData = data.predictions_data?.[period];
-    if (!predictionsData) {
+    // Use Bachata predictions if available, otherwise fall back to simple predictions
+    let predictionsData;
+    if (data.bachata_predictions && Object.keys(data.bachata_predictions).length > 0) {
+        console.log('Using Bachata Fourier predictions');
+        // Transform bachata_predictions structure: {Gold: {weekly: {...}, monthly: {...}}}
+        predictionsData = {};
+        for (const assetName in data.bachata_predictions) {
+            const assetPredictions = data.bachata_predictions[assetName];
+            if (assetPredictions[period]) {
+                predictionsData[assetName] = assetPredictions[period];
+            }
+        }
+    } else {
+        console.log('Using simple baseline predictions');
+        predictionsData = data.predictions_data?.[period];
+    }
+    
+    if (!predictionsData || Object.keys(predictionsData).length === 0) {
         console.error('No predictions data available for period:', period);
         console.log('Available data:', data);
         return;

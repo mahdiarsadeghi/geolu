@@ -1,14 +1,14 @@
 Geolu - Proprietary License with Educational Use
 
-Copyright (c) 2026 Mahdiar Sadeghi
+Copyright (c) 2026 Geolu
 
 TERMS AND CONDITIONS
 
 1. DEFINITIONS
    "Software" refers to Geolu (the predictive analytics repository), including all code, 
-   algorithms, predictive models, methodologies, and evaluation techniques.
+   numerical algorithms, predictive methodologies, and evaluation techniques.
    
-   "Algorithms" specifically includes but is not limited to the machine learning 
+   "Algorithms" specifically includes but is not limited to the numerical analysis, machine learning 
    implementations, feature engineering techniques, prediction methodologies, and 
    model evaluation frameworks contained in this repository.
 
@@ -54,7 +54,7 @@ TERMS AND CONDITIONS
    Any use, distribution, or derivative work must include:
    
    "This work uses prediction methodologies from Geolu
-   by Mahdiar Sadeghi (https://github.com/mahdiarsadeghi/geolu)"
+   (https://github.com/mahdiarsadeghi/geolu)"
 
 5. NO WARRANTY
 
@@ -76,8 +76,8 @@ TERMS AND CONDITIONS
 7. CONTACT FOR COMMERCIAL LICENSING
 
    For commercial licensing inquiries, please contact:
-   GitHub: @mahdiarsadeghi
-   Repository: https://github.com/mahdiarsadeghi/gold
+   Repository: https://github.com/mahdiarsadeghi/geolu
+   Organization: Geolu
 
 8. TERMINATION
 

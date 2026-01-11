@@ -3,7 +3,7 @@ Geolu - Where Algorithms Predict Value
 Predicts gold prices weekly and logs predictions over time.
 Supports multiple models for comparison and accuracy evaluation.
 
-Copyright (c) 2026 Mahdiar Sadeghi
+Copyright (c) 2026 Geolu
 Licensed under Proprietary License with Educational Use
 See LICENSE file for terms and conditions.
 
@@ -22,6 +22,7 @@ import json
 import os
 import warnings
 import pytz
+from algorithms.Bachata import BachataPredictor
 warnings.filterwarnings('ignore')
 
 
@@ -265,6 +266,97 @@ class GoldPricePredictor:
         
         return predictions
     
+    def generate_bachata_predictions(self) -> Dict[str, Dict]:
+        """
+        Generate predictions using the Bachata Fourier analysis algorithm.
+        
+        Returns:
+            Dictionary with predictions for all assets at different time scales
+        """
+        print("\nRunning Bachata Fourier Analysis...")
+        
+        # Fetch extended historical data for Bachata (5 years)
+        asset_data_5y = self.fetch_multiple_assets(period='5y')
+        
+        if not asset_data_5y:
+            print("  ✗ No data available for Bachata analysis")
+            return {}
+        
+        # Initialize Bachata predictor
+        bachata = BachataPredictor(window_months=6, lookback_years=5)
+        
+        try:
+            # Fit the model with all asset data
+            bachata.fit(asset_data_5y)
+            print("  ✓ Bachata model fitted")
+            
+            # Generate predictions for each asset at different time scales
+            all_predictions = {}
+            time_scales = {
+                'weekly': {'days': 7, 'points': 7, 'freq': 'D', 'label': 'daily'},      # 7 days (daily resolution)
+                'monthly': {'days': 28, 'points': 4, 'freq': '7D', 'label': 'weekly'},   # 4 weeks (weekly resolution)
+                'yearly': {'days': 365, 'points': 12, 'freq': '30D', 'label': 'monthly'} # 12 months (monthly resolution)
+            }
+            
+            for asset_name in ['Gold', 'Bitcoin', 'Oil', 'S&P 500']:
+                if asset_name not in asset_data_5y:
+                    continue
+                    
+                asset_predictions = {}
+                
+                for scale_name, scale_config in time_scales.items():
+                    # Get full prediction for the period
+                    result = bachata.predict(asset_name, scale_config['days'])
+                    
+                    # Get current price
+                    current_price = float(asset_data_5y[asset_name]['Close'].iloc[-1])
+                    
+                    # Generate dates at the appropriate frequency
+                    last_date = asset_data_5y[asset_name].index[-1]
+                    future_dates = pd.date_range(
+                        start=last_date + timedelta(days=1),
+                        periods=scale_config['points'],
+                        freq=scale_config['freq']
+                    )
+                    
+                    # Sample predictions at the appropriate intervals
+                    predictions_array = result['predictions']
+                    if isinstance(predictions_array, np.ndarray) and len(predictions_array) > 0:
+                        # Sample at intervals to get the right number of points
+                        interval = len(predictions_array) // scale_config['points']
+                        if interval < 1:
+                            interval = 1
+                        sampled_predictions = predictions_array[::max(1, interval)][:scale_config['points']]
+                        
+                        # Predictions are price changes, apply them progressively
+                        # Start from current price and add cumulative changes
+                        predictions_with_base = np.zeros(scale_config['points'])
+                        predictions_with_base[0] = current_price + sampled_predictions[0]
+                        for i in range(1, scale_config['points']):
+                            predictions_with_base[i] = predictions_with_base[i-1] + sampled_predictions[i]
+                    else:
+                        predictions_with_base = np.full(scale_config['points'], current_price)
+                    
+                    asset_predictions[scale_name] = {
+                        'dates': [d.strftime('%Y-%m-%d') for d in future_dates],
+                        'prices': [float(p) for p in predictions_with_base],
+                        'confidence': float(result['confidence'][0]),
+                        'dominant_frequencies': result['dominant_frequencies'][:3],  # Top 3
+                        'resolution': scale_config['label']
+                    }
+                    
+                    print(f"  ✓ {asset_name} {scale_name} predictions generated ({scale_config['points']} {scale_config['label']} points, confidence: {result['confidence'][0]:.2f})")
+                
+                all_predictions[asset_name] = asset_predictions
+            
+            return all_predictions
+            
+        except Exception as e:
+            print(f"  ✗ Bachata prediction failed: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return {}
+    
     def log_prediction(self, prediction):
         """Log the prediction to a JSON file."""
         # Load existing predictions
@@ -320,10 +412,13 @@ class GoldPricePredictor:
         monthly_data = self.get_time_period_data(days=30, period='3mo')
         yearly_data = self.get_time_period_data(days=365, period='2y')
         
-        # Generate predictions for different time periods
+        # Generate simple baseline predictions
         weekly_predictions = self.generate_simple_predictions(weekly_data, forecast_days=7)
         monthly_predictions = self.generate_simple_predictions(monthly_data, forecast_days=30)
         yearly_predictions = self.generate_simple_predictions(yearly_data, forecast_days=365)
+        
+        # Generate Bachata algorithm predictions
+        bachata_predictions = self.generate_bachata_predictions()
         
         # Prepare web data
         web_data = {
@@ -343,6 +438,7 @@ class GoldPricePredictor:
                 'monthly': monthly_predictions,
                 'yearly': yearly_predictions
             },
+            'bachata_predictions': bachata_predictions,  # Advanced Fourier predictions
             'predictions': prediction['predictions'],
             'prediction_history': self.get_prediction_history()
         }

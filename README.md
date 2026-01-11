@@ -1,7 +1,7 @@
 # Geolu
 *Where Algorithms Predict Value*
 
-## 🌐 Live Dashboard
+##  Live Dashboard
 
 **Access real-time market predictions:** [https://mahdiarsadeghi.github.io/geolu/](https://mahdiarsadeghi.github.io/geolu/)
 
