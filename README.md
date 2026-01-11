@@ -21,19 +21,6 @@ Geolu is a sophisticated financial market oracle that delivers data-driven predi
 - Multi-asset predictions spanning days to months ahead
 - Proprietary evaluation methods ensure prediction reliability and continuous improvement
 
-**Dynamic Visualization**
-- Side-by-side comparison of historical data and predicted trajectories
-- Four-axis chart system for simultaneous cross-asset analysis
-- Responsive, professional interface designed for decision-making
-
-## Platform Capabilities
-
-The current dashboard provides:
-- **Historical Context**: Comprehensive price history visualization with configurable time ranges
-- **Predictive Forecasting**: Smoothed trend projections based on proprietary models
-- **Multi-Asset Coverage**: Gold, Oil, Bitcoin, and S&P 500 tracking and prediction
-- **Live Updates**: Real-time data integration from Yahoo Finance API
-
 ## Future Features
 
 Geolu is evolving into a comprehensive prediction platform. Upcoming capabilities include:
@@ -45,8 +32,6 @@ Geolu is evolving into a comprehensive prediction platform. Upcoming capabilitie
 - **Portfolio Optimization**: AI-driven allocation recommendations across tracked assets
 
 ## Disclaimer
-
-⚠️ **For informational purposes only.**
 
 Geolu provides predictive analytics based on historical data and quantitative models. All predictions carry inherent uncertainty. Past performance does not guarantee future results. This platform should inform, not replace, professional financial advice. Users are responsible for their own investment decisions.
 
