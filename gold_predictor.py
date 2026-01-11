@@ -21,6 +21,7 @@ from sklearn.svm import SVR
 import json
 import os
 import warnings
+import pytz
 warnings.filterwarnings('ignore')
 
 
@@ -162,11 +163,15 @@ class GoldPricePredictor:
                 'price_change_percent': float(price_change_percent)
             }
         
+        # Get current time in New York timezone
+        ny_tz = pytz.timezone('America/New_York')
+        now_ny = datetime.now(ny_tz)
+        
         return {
             'current_price': float(current_price),
             'predictions': predictions,
-            'prediction_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'target_date': (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d'),
+            'prediction_date': now_ny.strftime('%Y-%m-%d %H:%M:%S'),
+            'target_date': (now_ny + timedelta(days=7)).strftime('%Y-%m-%d'),
             'historical_data': self.get_recent_historical_data(df_features)
         }
     

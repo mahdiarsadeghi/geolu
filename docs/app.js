@@ -152,6 +152,21 @@ function createHistoricalChart(data, period = 'weekly') {
                 intersect: false
             },
             plugins: {
+                title: {
+                    display: true,
+                    text: 'Data source: Yahoo Finance API',
+                    position: 'bottom',
+                    align: 'start',
+                    font: {
+                        size: 9,
+                        style: 'italic'
+                    },
+                    color: '#a0aec0',
+                    padding: {
+                        top: 10,
+                        bottom: 0
+                    }
+                },
                 legend: {
                     display: true,
                     position: 'top',

@@ -248,10 +248,16 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
 }
 
 footer p {
     margin: 0;
+    text-align: left;
+}
+
+footer p:last-child {
+    text-align: right;
 }
 
 footer a {
