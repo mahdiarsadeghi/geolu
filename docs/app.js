@@ -6,104 +6,139 @@
  */
 
 // Global variables
-let priceChart = null;
+let historicalChart = null;
+let chartData = null;
+let currentPeriod = 'weekly';
 
 // Fetch and display data
 async function loadData() {
     try {
         const response = await fetch('data.json');
         const data = await response.json();
+        chartData = data;
         
         updateStatusBar(data);
-        createPriceChart(data);
+        createHistoricalChart(data, currentPeriod);
         displayPredictions(data);
+        setupTabListeners();
     } catch (error) {
         console.error('Error loading data:', error);
-        document.getElementById('predictions-grid').innerHTML = 
+        document.getElementById('predictions-content').innerHTML = 
             '<div class="loading">Error loading data. Please run the predictor first.</div>';
     }
+}
+
+// Setup tab button listeners
+function setupTabListeners() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+            // Update chart
+            currentPeriod = this.getAttribute('data-period');
+            createHistoricalChart(chartData, currentPeriod);
+        });
+    });
 }
 
 // Update status bar
 function updateStatusBar(data) {
     document.getElementById('last-updated').textContent = formatDateTime(data.last_updated);
-    document.getElementById('current-price').textContent = `$${data.current_price.toFixed(2)} USD/oz`;
-    document.getElementById('target-date').textContent = formatDate(data.target_date);
 }
 
-// Create price chart with predictions
-function createPriceChart(data) {
-    const ctx = document.getElementById('priceChart').getContext('2d');
+// Create historical prices chart for multiple assets
+function createHistoricalChart(data, period = 'weekly') {
+    const ctx = document.getElementById('historicalChart').getContext('2d');
     
     // Destroy existing chart if it exists
-    if (priceChart) {
-        priceChart.destroy();
+    if (historicalChart) {
+        historicalChart.destroy();
     }
     
-    // Prepare historical data
-    const historicalDates = data.historical.dates;
-    const historicalPrices = data.historical.prices;
-    
-    // Get next week dates (Monday to Saturday)
-    const targetDate = new Date(data.target_date);
-    const futureDates = [];
-    const currentDate = new Date(historicalDates[historicalDates.length - 1]);
-    
-    for (let i = 1; i <= 7; i++) {
-        const nextDate = new Date(currentDate);
-        nextDate.setDate(currentDate.getDate() + i);
-        futureDates.push(nextDate.toISOString().split('T')[0]);
+    // Get data for the selected period
+    let dataSource;
+    if (data.time_periods && data.time_periods[period]) {
+        dataSource = data.time_periods[period];
+    } else if (period === 'weekly' && data.past_week) {
+        dataSource = data.past_week;
+    } else {
+        dataSource = data.all_assets;
     }
     
-    // Create datasets for each model
-    const datasets = [
-        {
-            label: 'Historical Price',
-            data: historicalPrices,
-            borderColor: '#667eea',
-            backgroundColor: 'rgba(102, 126, 234, 0.1)',
-            borderWidth: 3,
-            pointRadius: 2,
-            pointHoverRadius: 5,
-            tension: 0.4,
-            fill: true
-        }
-    ];
+    if (!dataSource) {
+        console.error('No asset data available');
+        return;
+    }
     
-    // Add prediction lines for each model
+    // Colors for each asset
     const colors = {
-        'Random Forest': '#10b981',
-        'Linear Regression': '#f59e0b',
-        'Ridge Regression': '#3b82f6',
-        'Gradient Boosting': '#8b5cf6',
-        'SVR': '#ec4899'
+        'Gold': '#f59e0b',
+        'Bitcoin': '#f97316',
+        'Oil': '#0ea5e9',
+        'S&P 500': '#8b5cf6'
     };
     
-    let colorIndex = 0;
-    for (const [modelName, prediction] of Object.entries(data.predictions)) {
-        const predictionLine = new Array(historicalPrices.length - 1).fill(null);
-        predictionLine.push(historicalPrices[historicalPrices.length - 1]);
-        predictionLine.push(prediction.predicted_price);
-        
-        datasets.push({
-            label: `${modelName} Prediction`,
-            data: predictionLine,
-            borderColor: colors[modelName] || `hsl(${colorIndex * 60}, 70%, 50%)`,
-            borderWidth: 2,
-            borderDash: [5, 5],
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            tension: 0,
-            fill: false
-        });
-        
-        colorIndex++;
+    // Create datasets for each asset with actual prices (not normalized)
+    const datasets = [];
+    const assetNames = Object.keys(dataSource);
+    
+    // Get common date range
+    let allDates = [];
+    for (const assetName of assetNames) {
+        const asset = dataSource[assetName];
+        if (asset.dates && asset.dates.length > 0) {
+            allDates = asset.dates;
+            break;
+        }
     }
     
-    // Combine all dates
-    const allDates = [...historicalDates, futureDates[0]];
+    // Create a dataset for each asset on its own y-axis
+    for (const assetName of assetNames) {
+        const asset = dataSource[assetName];
+        if (!asset.prices || asset.prices.length === 0) continue;
+        
+        datasets.push({
+            label: assetName,
+            data: asset.prices,
+            borderColor: colors[assetName] || '#667eea',
+            backgroundColor: 'transparent',
+            borderWidth: 2.5,
+            pointRadius: 0,
+            pointHoverRadius: 0,
+            tension: 0.3,
+            yAxisID: assetName.replace(/[^a-zA-Z0-9]/g, '') // Create unique y-axis ID
+        });
+    }
     
-    priceChart = new Chart(ctx, {
+    // Create y-axes configuration for each asset
+    const yAxes = {};
+    assetNames.forEach((assetName, index) => {
+        const axisId = assetName.replace(/[^a-zA-Z0-9]/g, '');
+        yAxes[axisId] = {
+            type: 'linear',
+            display: true,
+            position: index % 2 === 0 ? 'left' : 'right',
+            grid: {
+                drawOnChartArea: index === 0, // Only show grid for first axis
+            },
+            title: {
+                display: true,
+                text: assetName,
+                color: colors[assetName] || '#667eea'
+            },
+            ticks: {
+                color: colors[assetName] || '#667eea',
+                callback: function(value) {
+                    return '$' + value.toLocaleString();
+                }
+            }
+        };
+    });
+    
+    historicalChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: allDates,
@@ -122,7 +157,11 @@ function createPriceChart(data) {
                     position: 'top',
                     labels: {
                         usePointStyle: true,
-                        padding: 15
+                        padding: 15,
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
                     }
                 },
                 tooltip: {
@@ -133,7 +172,10 @@ function createPriceChart(data) {
                                 label += ': ';
                             }
                             if (context.parsed.y !== null) {
-                                label += '$' + context.parsed.y.toFixed(2);
+                                label += '$' + context.parsed.y.toLocaleString(undefined, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
                             }
                             return label;
                         }
@@ -141,18 +183,16 @@ function createPriceChart(data) {
                 }
             },
             scales: {
-                y: {
-                    beginAtZero: false,
-                    ticks: {
-                        callback: function(value) {
-                            return '$' + value.toFixed(0);
-                        }
-                    }
-                },
+                ...yAxes,
                 x: {
                     ticks: {
                         maxRotation: 45,
-                        minRotation: 45
+                        minRotation: 45,
+                        maxTicksLimit: 7
+                    },
+                    title: {
+                        display: true,
+                        text: 'Date'
                     }
                 }
             }
@@ -160,10 +200,19 @@ function createPriceChart(data) {
     });
 }
 
-// Display predictions
+// Display predictions in right column
 function displayPredictions(data) {
-    const predictionsGrid = document.getElementById('predictions-grid');
-    predictionsGrid.innerHTML = '';
+    const predictionsContent = document.getElementById('predictions-content');
+    predictionsContent.innerHTML = '';
+    
+    if (!data.predictions || Object.keys(data.predictions).length === 0) {
+        predictionsContent.innerHTML = '<div class="loading">No predictions available</div>';
+        return;
+    }
+    
+    // Create predictions grid
+    const grid = document.createElement('div');
+    grid.className = 'predictions-grid';
     
     for (const [modelName, prediction] of Object.entries(data.predictions)) {
         const card = document.createElement('div');
@@ -180,8 +229,10 @@ function displayPredictions(data) {
             </div>
         `;
         
-        predictionsGrid.appendChild(card);
+        grid.appendChild(card);
     }
+    
+    predictionsContent.appendChild(grid);
 }
 
 // Helper functions

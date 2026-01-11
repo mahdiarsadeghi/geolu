@@ -29,9 +29,34 @@ class GoldPricePredictor:
         """Initialize the gold price predictor."""
         self.log_file = log_file
         self.web_data_file = web_data_file
-        self.gold_ticker = 'GC=F'  # Gold futures ticker
+        self.gold_ticker = 'GC=F'  # Gold futures
+        self.bitcoin_ticker = 'BTC-USD'  # Bitcoin
+        self.oil_ticker = 'CL=F'  # Crude Oil futures
+        self.sp500_ticker = '^GSPC'  # S&P 500
         self.models = {}
         self.predictions = {}
+    
+    def fetch_multiple_assets(self, period='2y'):
+        """Fetch historical data for multiple assets."""
+        print(f"Fetching market data for multiple assets...")
+        assets = {
+            'Gold': self.gold_ticker,
+            'Bitcoin': self.bitcoin_ticker,
+            'Oil': self.oil_ticker,
+            'S&P 500': self.sp500_ticker
+        }
+        
+        asset_data = {}
+        for name, ticker in assets.items():
+            try:
+                data = yf.download(ticker, period=period, progress=False)
+                if not data.empty:
+                    asset_data[name] = data
+                    print(f"  ✓ {name} data fetched")
+            except Exception as e:
+                print(f"  ✗ {name} data failed: {e}")
+        
+        return asset_data
         
     def fetch_gold_data(self, period='2y'):
         """Fetch historical gold price data."""
@@ -153,6 +178,52 @@ class GoldPricePredictor:
             'prices': [float(p.item()) if hasattr(p, 'item') else float(p) for p in recent_data['Close'].values]
         }
     
+    def get_all_assets_historical_data(self, days=30):
+        """Get recent historical data for all assets."""
+        asset_data = self.fetch_multiple_assets(period='1y')
+        all_historical = {}
+        
+        for asset_name, data in asset_data.items():
+            if not data.empty:
+                recent_data = data.tail(days)[['Close']].copy()
+                all_historical[asset_name] = {
+                    'dates': [d.strftime('%Y-%m-%d') for d in recent_data.index],
+                    'prices': [float(p.item()) if hasattr(p, 'item') else float(p) for p in recent_data['Close'].values]
+                }
+        
+        return all_historical
+    
+    def get_past_week_data(self):
+        """Get past week (7 days) of historical data for all assets."""
+        asset_data = self.fetch_multiple_assets(period='1mo')  # Fetch 1 month to ensure we have at least 7 days
+        week_historical = {}
+        
+        for asset_name, data in asset_data.items():
+            if not data.empty:
+                # Get last 7 trading days
+                week_data = data.tail(7)[['Close']].copy()
+                week_historical[asset_name] = {
+                    'dates': [d.strftime('%Y-%m-%d') for d in week_data.index],
+                    'prices': [float(p.item()) if hasattr(p, 'item') else float(p) for p in week_data['Close'].values]
+                }
+        
+        return week_historical
+    
+    def get_time_period_data(self, days, period):
+        """Get historical data for a specific time period for all assets."""
+        asset_data = self.fetch_multiple_assets(period=period)
+        period_historical = {}
+        
+        for asset_name, data in asset_data.items():
+            if not data.empty:
+                period_data = data.tail(days)[['Close']].copy()
+                period_historical[asset_name] = {
+                    'dates': [d.strftime('%Y-%m-%d') for d in period_data.index],
+                    'prices': [float(p.item()) if hasattr(p, 'item') else float(p) for p in period_data['Close'].values]
+                }
+        
+        return period_historical
+    
     def log_prediction(self, prediction):
         """Log the prediction to a JSON file."""
         # Load existing predictions
@@ -200,12 +271,27 @@ class GoldPricePredictor:
         # Ensure docs directory exists
         os.makedirs(os.path.dirname(self.web_data_file), exist_ok=True)
         
+        # Get historical data for all assets (30 days for context)
+        all_assets_historical = self.get_all_assets_historical_data(days=30)
+        
+        # Get data for different time periods
+        weekly_data = self.get_time_period_data(days=7, period='1mo')
+        monthly_data = self.get_time_period_data(days=30, period='3mo')
+        yearly_data = self.get_time_period_data(days=365, period='2y')
+        
         # Prepare web data
         web_data = {
             'last_updated': prediction['prediction_date'],
             'current_price': prediction['current_price'],
             'target_date': prediction['target_date'],
             'historical': prediction['historical_data'],
+            'all_assets': all_assets_historical,
+            'past_week': weekly_data,  # Keep for backward compatibility
+            'time_periods': {
+                'weekly': weekly_data,
+                'monthly': monthly_data,
+                'yearly': yearly_data
+            },
             'predictions': prediction['predictions'],
             'prediction_history': self.get_prediction_history()
         }

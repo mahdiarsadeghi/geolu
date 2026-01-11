@@ -19,12 +19,41 @@ body {
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     overflow: hidden;
+    position: relative;
+}
+
+.github-link {
+    position: absolute;
+    top: 50%;
+    right: 30px;
+    transform: translateY(-50%);
+    z-index: 1000;
+    color: white;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.github-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    opacity: 0.8;
+}
+
+.github-link svg {
+    width: 24px;
+    height: 24px;
 }
 
 header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 40px 30px;
+    position: relative;
 }
 
 .header-content {
@@ -46,51 +75,101 @@ header h1 {
 }
 
 .status-bar {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    padding: 30px;
+    padding: 20px 30px;
     background: #f8f9fa;
     border-bottom: 2px solid #e9ecef;
-}
-
-.status-item {
-    text-align: center;
-}
-
-.status-item .label {
-    display: block;
-    font-size: 0.85em;
     color: #6c757d;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 0.9em;
 }
 
-.status-item .price {
-    font-size: 1.8em;
-    font-weight: 700;
-    color: #667eea;
+.status-bar p {
+    margin: 0;
+}
+
+.status-bar #last-updated {
+    color: #2d3748;
+    font-weight: 500;
 }
 
 section {
     padding: 40px 30px;
 }
 
+.main-section {
+    padding: 40px 30px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.two-column-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.left-column, .right-column {
+    min-width: 0;
+}
+
 h2 {
-    font-size: 1.8em;
+    font-size: 1.5em;
     margin-bottom: 20px;
     color: #2d3748;
 }
 
-.chart-section {
-    border-bottom: 2px solid #e9ecef;
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.chart-header h2 {
+    margin: 0;
+}
+
+.time-tabs {
+    display: flex;
+    gap: 12px;
+}
+
+.tab-button {
+    padding: 12px 28px;
+    border: 2px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.tab-button:hover {
+    background: #f7fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+}
+
+.tab-button.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .chart-container {
     position: relative;
     height: 400px;
     margin-top: 20px;
+}
+
+.chart-footnote {
+    margin-top: 10px;
+    font-size: 10px !important;
+    color: #a0aec0;
+    font-style: italic;
+    text-align: left;
+    line-height: 1.2;
 }
 
 .predictions-grid {
@@ -163,22 +242,26 @@ h2 {
 
 footer {
     background: #2d3748;
-    color: white;
-    padding: 30px;
-    text-align: center;
+    color: #a0aec0;
+    padding: 20px 30px;
+    font-size: 0.9em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 footer p {
-    margin: 10px 0;
+    margin: 0;
 }
 
 footer a {
-    color: #667eea;
+    color: #a0aec0;
     text-decoration: none;
-    font-weight: 600;
+    margin-left: 5px;
 }
 
 footer a:hover {
+    color: #667eea;
     text-decoration: underline;
 }
 
@@ -197,6 +280,11 @@ footer a:hover {
     
     header h1 {
         font-size: 2em;
+    }
+    
+    .two-column-layout {
+        grid-template-columns: 1fr;
+        gap: 30px;
     }
     
     .chart-container {
