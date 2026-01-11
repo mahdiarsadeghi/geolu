@@ -7,6 +7,7 @@
 
 // Global variables
 let historicalChart = null;
+let predictionsChart = null;
 let chartData = null;
 let currentPeriod = 'weekly';
 
@@ -24,6 +25,7 @@ async function loadData() {
         
         updateStatusBar(data);
         createHistoricalChart(data, currentPeriod);
+        createPredictionsChart(data, currentPeriod);
         displayPredictions(data);
         setupTabListeners();
     } catch (error) {
@@ -42,9 +44,10 @@ function setupTabListeners() {
             tabButtons.forEach(btn => btn.classList.remove('active'));
             // Add active class to clicked button
             this.classList.add('active');
-            // Update chart
+            // Update charts
             currentPeriod = this.getAttribute('data-period');
             createHistoricalChart(chartData, currentPeriod);
+            createPredictionsChart(chartData, currentPeriod);
         });
     });
 }
@@ -277,6 +280,158 @@ function displayPredictions(data) {
     }
     
     predictionsContent.appendChild(grid);
+}
+
+// Create predictions chart for all assets
+function createPredictionsChart(data, period = 'weekly') {
+    console.log('Creating predictions chart for period:', period);
+    const canvas = document.getElementById('predictionsChart');
+    if (!canvas) {
+        console.error('Predictions canvas element not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Could not get predictions canvas context');
+        return;
+    }
+    
+    // Destroy existing chart if it exists
+    if (predictionsChart) {
+        predictionsChart.destroy();
+    }
+    
+    // Get prediction data for the selected period
+    const predictionsData = data.predictions_data?.[period];
+    if (!predictionsData) {
+        console.error('No predictions data available');
+        return;
+    }
+    
+    console.log('Predictions data:', predictionsData);
+    
+    // Colors for each asset
+    const colors = {
+        'Gold': '#f59e0b',
+        'Bitcoin': '#f97316',
+        'Oil': '#0ea5e9',
+        'S&P 500': '#8b5cf6'
+    };
+    
+    // Create datasets
+    const datasets = [];
+    const assetNames = Object.keys(predictionsData);
+    
+    // Get common date range
+    let allDates = [];
+    for (const assetName of assetNames) {
+        const asset = predictionsData[assetName];
+        if (asset.dates && asset.dates.length > 0) {
+            allDates = asset.dates;
+            break;
+        }
+    }
+    
+    for (const assetName of assetNames) {
+        const asset = predictionsData[assetName];
+        if (!asset.prices || asset.prices.length === 0) continue;
+        
+        datasets.push({
+            label: assetName,
+            data: asset.prices,
+            borderColor: colors[assetName] || '#667eea',
+            backgroundColor: 'transparent',
+            borderWidth: 2.5,
+            borderDash: [5, 5],
+            pointRadius: 0,
+            pointHoverRadius: 0,
+            tension: 0.4
+        });
+    }
+    
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js library not loaded');
+        return;
+    }
+    
+    try {
+        predictionsChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: allDates,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Predicted Trends (Smoothed)',
+                        position: 'top',
+                        font: {
+                            size: 13,
+                            weight: 'bold'
+                        },
+                        color: '#2d3748'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 10,
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += '$' + context.parsed.y.toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    });
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45,
+                            maxTicksLimit: 6
+                        }
+                    }
+                }
+            }
+        });
+        console.log('Predictions chart created successfully');
+    } catch (error) {
+        console.error('Error creating predictions chart:', error);
+    }
 }
 
 // Helper functions

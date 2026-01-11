@@ -229,6 +229,42 @@ class GoldPricePredictor:
         
         return period_historical
     
+    def generate_simple_predictions(self, historical_data, forecast_days):
+        """Generate simple smoothed predictions based on recent trends."""
+        predictions = {}
+        
+        for asset_name, data in historical_data.items():
+            if not data['prices']:
+                continue
+                
+            prices = data['prices']
+            # Calculate simple moving average trend
+            recent_avg = sum(prices[-min(5, len(prices)):]) / min(5, len(prices))
+            overall_avg = sum(prices) / len(prices)
+            trend = (recent_avg - overall_avg) / overall_avg
+            
+            # Generate smoothed predictions
+            last_price = prices[-1]
+            predicted_prices = []
+            for i in range(1, forecast_days + 1):
+                # Gentle trend continuation with dampening
+                predicted_change = trend * (1 - i / (forecast_days * 2))
+                predicted_price = last_price * (1 + predicted_change * 0.5)
+                predicted_prices.append(float(predicted_price))
+            
+            # Generate future dates
+            from datetime import datetime, timedelta
+            last_date = datetime.strptime(data['dates'][-1], '%Y-%m-%d')
+            predicted_dates = [(last_date + timedelta(days=i)).strftime('%Y-%m-%d') 
+                             for i in range(1, forecast_days + 1)]
+            
+            predictions[asset_name] = {
+                'dates': predicted_dates,
+                'prices': predicted_prices
+            }
+        
+        return predictions
+    
     def log_prediction(self, prediction):
         """Log the prediction to a JSON file."""
         # Load existing predictions
@@ -284,6 +320,11 @@ class GoldPricePredictor:
         monthly_data = self.get_time_period_data(days=30, period='3mo')
         yearly_data = self.get_time_period_data(days=365, period='2y')
         
+        # Generate predictions for different time periods
+        weekly_predictions = self.generate_simple_predictions(weekly_data, forecast_days=7)
+        monthly_predictions = self.generate_simple_predictions(monthly_data, forecast_days=30)
+        yearly_predictions = self.generate_simple_predictions(yearly_data, forecast_days=365)
+        
         # Prepare web data
         web_data = {
             'last_updated': prediction['prediction_date'],
@@ -296,6 +337,11 @@ class GoldPricePredictor:
                 'weekly': weekly_data,
                 'monthly': monthly_data,
                 'yearly': yearly_data
+            },
+            'predictions_data': {
+                'weekly': weekly_predictions,
+                'monthly': monthly_predictions,
+                'yearly': yearly_predictions
             },
             'predictions': prediction['predictions'],
             'prediction_history': self.get_prediction_history()
