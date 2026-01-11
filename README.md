@@ -41,4 +41,4 @@ Proprietary algorithms and predictive methodologies. Educational and personal us
 
 ---
 
-**Geolu** - Precision meets prediction in financial markets.
+**Geolu** - Where Algorithms Predict Value
