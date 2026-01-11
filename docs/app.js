@@ -47,8 +47,32 @@ function setupTabListeners() {
             currentPeriod = this.getAttribute('data-period');
             createHistoricalChart(chartData, currentPeriod);
             createPredictionsChart(chartData, currentPeriod);
+            // Highlight table column
+            highlightTableColumn(currentPeriod);
         });
     });
+    // Highlight initial column
+    highlightTableColumn(currentPeriod);
+}
+
+// Highlight table column based on selected period
+function highlightTableColumn(period) {
+    // Remove all highlights
+    document.querySelectorAll('.performance-table .highlight').forEach(el => {
+        el.classList.remove('highlight');
+    });
+    
+    // Add highlight to selected column
+    const columnClass = 'acc-' + period;
+    document.querySelectorAll('.' + columnClass).forEach(el => {
+        el.classList.add('highlight');
+    });
+    
+    // Highlight header
+    const header = document.querySelector(`.time-period[data-period="${period}"]`);
+    if (header) {
+        header.classList.add('highlight');
+    }
 }
 
 // Update status bar

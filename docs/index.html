@@ -49,47 +49,50 @@
         </section>
 
         <section class="accuracy-section">
-            <h2>Model Performance History</h2>
+            <h2>Predictive Algorithm Evaluation</h2>
             <div class="performance-table-container">
                 <table class="performance-table">
                     <thead>
                         <tr>
-                            <th>Algorithm</th>
-                            <th>Weekly Accuracy</th>
-                            <th>Monthly Accuracy</th>
-                            <th>Yearly Accuracy</th>
+                            <th rowspan="2">Algorithm</th>
+                            <th colspan="3">Accuracy</th>
+                        </tr>
+                        <tr>
+                            <th class="time-period" data-period="weekly">Weekly</th>
+                            <th class="time-period" data-period="monthly">Monthly</th>
+                            <th class="time-period" data-period="yearly">Yearly</th>
                         </tr>
                     </thead>
                     <tbody id="performance-tbody">
                         <tr>
-                            <td>Trend Analysis</td>
-                            <td>85.2%</td>
-                            <td>78.4%</td>
-                            <td>71.6%</td>
+                            <td><button class="algorithm-button" data-algo="trend">Trend Analysis</button></td>
+                            <td class="acc-weekly">85.2%</td>
+                            <td class="acc-monthly">78.4%</td>
+                            <td class="acc-yearly">71.6%</td>
                         </tr>
                         <tr>
-                            <td>Moving Average</td>
-                            <td>82.7%</td>
-                            <td>80.1%</td>
-                            <td>74.3%</td>
+                            <td><button class="algorithm-button" data-algo="ma">Moving Average</button></td>
+                            <td class="acc-weekly">82.7%</td>
+                            <td class="acc-monthly">80.1%</td>
+                            <td class="acc-yearly">74.3%</td>
                         </tr>
                         <tr>
-                            <td>Momentum Analysis</td>
-                            <td>79.5%</td>
-                            <td>76.8%</td>
-                            <td>69.2%</td>
+                            <td><button class="algorithm-button" data-algo="momentum">Momentum Analysis</button></td>
+                            <td class="acc-weekly">79.5%</td>
+                            <td class="acc-monthly">76.8%</td>
+                            <td class="acc-yearly">69.2%</td>
                         </tr>
                         <tr>
-                            <td>Pattern Recognition</td>
-                            <td>88.1%</td>
-                            <td>82.3%</td>
-                            <td>76.9%</td>
+                            <td><button class="algorithm-button" data-algo="pattern">Pattern Recognition</button></td>
+                            <td class="acc-weekly">88.1%</td>
+                            <td class="acc-monthly">82.3%</td>
+                            <td class="acc-yearly">76.9%</td>
                         </tr>
                         <tr>
-                            <td>Ensemble Model</td>
-                            <td>91.4%</td>
-                            <td>86.7%</td>
-                            <td>79.5%</td>
+                            <td><button class="algorithm-button" data-algo="ensemble">Ensemble Model</button></td>
+                            <td class="acc-weekly">91.4%</td>
+                            <td class="acc-monthly">86.7%</td>
+                            <td class="acc-yearly">79.5%</td>
                         </tr>
                     </tbody>
                 </table>

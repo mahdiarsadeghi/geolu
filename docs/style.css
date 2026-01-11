@@ -288,6 +288,41 @@ h2 {
     border-bottom: none;
 }
 
+.algorithm-button {
+    background: transparent;
+    border: none;
+    color: #2d3748;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    text-align: left;
+    width: 100%;
+}
+
+.algorithm-button:hover {
+    background: #e9ecef;
+    color: #667eea;
+}
+
+.performance-table th[colspan] {
+    font-size: 16px;
+    padding: 20px;
+}
+
+.performance-table .time-period {
+    font-size: 13px;
+    padding: 12px 20px;
+}
+
+.performance-table td.highlight,
+.performance-table th.highlight {
+    background: rgba(102, 126, 234, 0.15);
+    font-weight: 600;
+}
+
 footer {
     background: #2d3748;
     color: #a0aec0;
