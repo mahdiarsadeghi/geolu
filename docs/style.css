@@ -232,19 +232,60 @@ h2 {
 
 .accuracy-section {
     background: #f8f9fa;
+    padding: 40px 30px;
 }
 
-.note {
-    color: #6c757d;
-    font-style: italic;
-    margin-bottom: 20px;
+.performance-table-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 }
 
-#accuracy-info {
-    padding: 20px;
+.performance-table {
+    width: 80%;
+    max-width: 800px;
+    border-collapse: collapse;
     background: white;
     border-radius: 8px;
-    border: 1px solid #e9ecef;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.performance-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.performance-table th,
+.performance-table td {
+    padding: 15px 20px;
+    text-align: center;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.performance-table th {
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.performance-table td {
+    font-size: 15px;
+    color: #2d3748;
+}
+
+.performance-table td:first-child {
+    text-align: left;
+    font-weight: 500;
+}
+
+.performance-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.performance-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 footer {
