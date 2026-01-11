@@ -140,6 +140,7 @@ function createHistoricalChart(data, period = 'weekly') {
             type: 'linear',
             display: true,
             position: isRightSide ? 'right' : 'left',
+            offset: true,
             grid: {
                 drawOnChartArea: index === 0, // Only show grid for first axis
             },
@@ -147,14 +148,22 @@ function createHistoricalChart(data, period = 'weekly') {
                 display: true,
                 text: assetName,
                 color: colors[assetName] || '#667eea',
-                padding: isRightSide ? { left: 10, right: 5 } : { left: 5, right: 10 }
+                padding: {
+                    top: 0,
+                    bottom: 5
+                }
             },
             ticks: {
                 color: colors[assetName] || '#667eea',
                 callback: function(value) {
                     return '$' + value.toLocaleString();
                 },
-                padding: isRightSide ? 10 : 5
+                padding: isRightSide ? 15 : 5,
+                autoSkip: true,
+                maxTicksLimit: 6
+            },
+            border: {
+                display: true
             }
         };
     });
