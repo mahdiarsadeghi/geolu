@@ -276,7 +276,7 @@ h2 {
 }
 
 .performance-table td:first-child {
-    text-align: left;
+    text-align: center !important;
     font-weight: 500;
 }
 

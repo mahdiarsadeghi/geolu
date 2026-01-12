@@ -471,3 +471,56 @@ class BachataPredictor:
             confidence = 0.5
         
         return float(confidence)
+
+
+def predict_all_assets(historical_data, forecast_days=7):
+    """
+    Simplified interface to predict all assets for a given forecast period.
+    
+    Args:
+        historical_data: DataFrame with columns [Gold, Bitcoin, Oil, S&P 500] or
+                        Dictionary of {asset_name: DataFrame with 'Close' column}
+        forecast_days: Number of days to forecast (7 for week, 30 for month, 365 for year)
+    
+    Returns:
+        Dictionary with predictions for each asset:
+        {
+            'Gold': {'weekly': prices, 'confidence': value},
+            'Bitcoin': {...},
+            'Oil': {...},
+            'S&P 500': {...}
+        }
+    """
+    # Convert DataFrame to dictionary format if needed
+    if isinstance(historical_data, pd.DataFrame):
+        asset_data = {}
+        for asset_name in ['Gold', 'Bitcoin', 'Oil', 'S&P 500']:
+            if asset_name in historical_data.columns:
+                df = pd.DataFrame({'Close': historical_data[asset_name]})
+                asset_data[asset_name] = df
+    else:
+        asset_data = historical_data
+    
+    # Initialize and fit Bachata model
+    predictor = BachataPredictor(window_months=6, lookback_years=5)
+    predictor.fit(asset_data)
+    
+    # Generate predictions for all assets
+    results = {}
+    for asset_name in ['Gold', 'Bitcoin', 'Oil', 'S&P 500']:
+        if asset_name in asset_data:
+            prediction = predictor.predict(asset_name, forecast_days)
+            
+            # Get current price
+            current_price = asset_data[asset_name]['Close'].iloc[-1]
+            
+            # Convert price changes to absolute prices
+            predicted_prices = current_price + np.cumsum(prediction['predictions'])
+            
+            results[asset_name] = {
+                'prices': [float(p) for p in predicted_prices],
+                'confidence': float(prediction['confidence'][0]),
+                'dominant_frequencies': prediction['dominant_frequencies']
+            }
+    
+    return results

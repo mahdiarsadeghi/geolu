@@ -1,0 +1,388 @@
+{
+  "Bachata": {
+    "algorithm": "Bachata",
+    "evaluation_date": "2026-01-11 22:54:39",
+    "windows": {
+      "4y-3y": {
+        "weekly": {
+          "Gold": {
+            "predicted_price": 1871.494,
+            "actual_price": 1907.2,
+            "last_observed_price": 1871.6,
+            "absolute_error": 35.706,
+            "normalized_error_percent": 1.908,
+            "confidence": 0.09749297554332831
+          },
+          "Bitcoin": {
+            "predicted_price": 17446.153,
+            "actual_price": 21161.52,
+            "last_observed_price": 17446.293,
+            "absolute_error": 3715.367,
+            "normalized_error_percent": 21.296,
+            "confidence": 0.4546178149377163
+          },
+          "Oil": {
+            "predicted_price": 74.877,
+            "actual_price": 80.18,
+            "last_observed_price": 75.12,
+            "absolute_error": 5.303,
+            "normalized_error_percent": 7.059,
+            "confidence": 0.22935776991281645
+          },
+          "S&P 500": {
+            "predicted_price": 3919.022,
+            "actual_price": 3990.97,
+            "last_observed_price": 3919.25,
+            "absolute_error": 71.948,
+            "normalized_error_percent": 1.836,
+            "confidence": 0.09356455653087914
+          }
+        },
+        "monthly": {
+          "Gold": {
+            "predicted_price": 1872.202,
+            "actual_price": 1866.2,
+            "last_observed_price": 1871.6,
+            "absolute_error": 6.002,
+            "normalized_error_percent": 0.321,
+            "confidence": 0.09749297554332831
+          },
+          "Bitcoin": {
+            "predicted_price": 17446.632,
+            "actual_price": 21819.039,
+            "last_observed_price": 17446.293,
+            "absolute_error": 4372.407,
+            "normalized_error_percent": 25.062,
+            "confidence": 0.4546178149377163
+          },
+          "Oil": {
+            "predicted_price": 75.34,
+            "actual_price": 78.06,
+            "last_observed_price": 75.12,
+            "absolute_error": 2.72,
+            "normalized_error_percent": 3.621,
+            "confidence": 0.22935776991281645
+          },
+          "S&P 500": {
+            "predicted_price": 3919.188,
+            "actual_price": 4081.5,
+            "last_observed_price": 3919.25,
+            "absolute_error": 162.312,
+            "normalized_error_percent": 4.141,
+            "confidence": 0.09356455653087914
+          }
+        },
+        "yearly": {
+          "Gold": {
+            "predicted_price": 1871.543,
+            "actual_price": 2021.7,
+            "last_observed_price": 1871.6,
+            "absolute_error": 150.157,
+            "normalized_error_percent": 8.023,
+            "confidence": 0.09749297554332831
+          },
+          "Bitcoin": {
+            "predicted_price": 17446.255,
+            "actual_price": 46627.777,
+            "last_observed_price": 17446.293,
+            "absolute_error": 29181.522,
+            "normalized_error_percent": 167.265,
+            "confidence": 0.4546178149377163
+          },
+          "Oil": {
+            "predicted_price": 74.938,
+            "actual_price": 71.37,
+            "last_observed_price": 75.12,
+            "absolute_error": 3.568,
+            "normalized_error_percent": 4.75,
+            "confidence": 0.22935776991281645
+          },
+          "S&P 500": {
+            "predicted_price": 3919.137,
+            "actual_price": 4783.45,
+            "last_observed_price": 3919.25,
+            "absolute_error": 864.313,
+            "normalized_error_percent": 22.053,
+            "confidence": 0.09356455653087914
+          }
+        }
+      },
+      "4y-2y": {
+        "weekly": {
+          "Gold": {
+            "predicted_price": 2021.87,
+            "actual_price": 2002.6,
+            "last_observed_price": 2021.7,
+            "absolute_error": 19.27,
+            "normalized_error_percent": 0.953,
+            "confidence": 0.5452237149971584
+          },
+          "Bitcoin": {
+            "predicted_price": 46628.006,
+            "actual_price": 42742.652,
+            "last_observed_price": 46627.777,
+            "absolute_error": 3885.354,
+            "normalized_error_percent": 8.333,
+            "confidence": 0.09797501401060726
+          },
+          "Oil": {
+            "predicted_price": 71.558,
+            "actual_price": 72.56,
+            "last_observed_price": 71.37,
+            "absolute_error": 1.002,
+            "normalized_error_percent": 1.404,
+            "confidence": 0.03396698949959934
+          },
+          "S&P 500": {
+            "predicted_price": 4783.681,
+            "actual_price": 4739.21,
+            "last_observed_price": 4783.45,
+            "absolute_error": 44.471,
+            "normalized_error_percent": 0.93,
+            "confidence": 0.13789027831377207
+          }
+        },
+        "monthly": {
+          "Gold": {
+            "predicted_price": 2022.082,
+            "actual_price": 2023.3,
+            "last_observed_price": 2021.7,
+            "absolute_error": 1.218,
+            "normalized_error_percent": 0.06,
+            "confidence": 0.5452237149971584
+          },
+          "Bitcoin": {
+            "predicted_price": 46628.087,
+            "actual_price": 47147.199,
+            "last_observed_price": 46627.777,
+            "absolute_error": 519.112,
+            "normalized_error_percent": 1.113,
+            "confidence": 0.09797501401060726
+          },
+          "Oil": {
+            "predicted_price": 70.986,
+            "actual_price": 76.84,
+            "last_observed_price": 71.37,
+            "absolute_error": 5.854,
+            "normalized_error_percent": 8.202,
+            "confidence": 0.03396698949959934
+          },
+          "S&P 500": {
+            "predicted_price": 4783.432,
+            "actual_price": 5026.61,
+            "last_observed_price": 4783.45,
+            "absolute_error": 243.178,
+            "normalized_error_percent": 5.084,
+            "confidence": 0.13789027831377207
+          }
+        },
+        "yearly": {
+          "Gold": {
+            "predicted_price": 2021.744,
+            "actual_price": 2664.5,
+            "last_observed_price": 2021.7,
+            "absolute_error": 642.756,
+            "normalized_error_percent": 31.793,
+            "confidence": 0.5452237149971584
+          },
+          "Bitcoin": {
+            "predicted_price": 46627.882,
+            "actual_price": 95043.523,
+            "last_observed_price": 46627.777,
+            "absolute_error": 48415.641,
+            "normalized_error_percent": 103.834,
+            "confidence": 0.09797501401060726
+          },
+          "Oil": {
+            "predicted_price": 71.458,
+            "actual_price": 73.32,
+            "last_observed_price": 71.37,
+            "absolute_error": 1.862,
+            "normalized_error_percent": 2.609,
+            "confidence": 0.03396698949959934
+          },
+          "S&P 500": {
+            "predicted_price": 4783.628,
+            "actual_price": 5918.25,
+            "last_observed_price": 4783.45,
+            "absolute_error": 1134.622,
+            "normalized_error_percent": 23.72,
+            "confidence": 0.13789027831377207
+          }
+        }
+      },
+      "4y-1y": {
+        "weekly": {
+          "Gold": {
+            "predicted_price": 2664.714,
+            "actual_price": 2746.4,
+            "last_observed_price": 2664.5,
+            "absolute_error": 81.686,
+            "normalized_error_percent": 3.066,
+            "confidence": 0.09256736723529785
+          },
+          "Bitcoin": {
+            "predicted_price": 95043.773,
+            "actual_price": 99756.906,
+            "last_observed_price": 95043.523,
+            "absolute_error": 4713.133,
+            "normalized_error_percent": 4.959,
+            "confidence": 0.029241144066128433
+          },
+          "Oil": {
+            "predicted_price": 73.193,
+            "actual_price": 78.68,
+            "last_observed_price": 73.32,
+            "absolute_error": 5.487,
+            "normalized_error_percent": 7.483,
+            "confidence": 0.018636815106661125
+          },
+          "S&P 500": {
+            "predicted_price": 5918.467,
+            "actual_price": 5937.34,
+            "last_observed_price": 5918.25,
+            "absolute_error": 18.873,
+            "normalized_error_percent": 0.319,
+            "confidence": 0.11782858769869659
+          }
+        },
+        "monthly": {
+          "Gold": {
+            "predicted_price": 2664.388,
+            "actual_price": 2867.3,
+            "last_observed_price": 2664.5,
+            "absolute_error": 202.912,
+            "normalized_error_percent": 7.615,
+            "confidence": 0.09256736723529785
+          },
+          "Bitcoin": {
+            "predicted_price": 95043.881,
+            "actual_price": 96529.086,
+            "last_observed_price": 95043.523,
+            "absolute_error": 1485.205,
+            "normalized_error_percent": 1.563,
+            "confidence": 0.029241144066128433
+          },
+          "Oil": {
+            "predicted_price": 73.542,
+            "actual_price": 71.0,
+            "last_observed_price": 73.32,
+            "absolute_error": 2.542,
+            "normalized_error_percent": 3.468,
+            "confidence": 0.018636815106661125
+          },
+          "S&P 500": {
+            "predicted_price": 5918.175,
+            "actual_price": 6025.99,
+            "last_observed_price": 5918.25,
+            "absolute_error": 107.815,
+            "normalized_error_percent": 1.822,
+            "confidence": 0.11782858769869659
+          }
+        },
+        "yearly": {
+          "Gold": {
+            "predicted_price": 2664.639,
+            "actual_price": 4490.3,
+            "last_observed_price": 2664.5,
+            "absolute_error": 1825.661,
+            "normalized_error_percent": 68.518,
+            "confidence": 0.09256736723529785
+          },
+          "Bitcoin": {
+            "predicted_price": 95043.642,
+            "actual_price": 90513.102,
+            "last_observed_price": 95043.523,
+            "absolute_error": 4530.54,
+            "normalized_error_percent": 4.767,
+            "confidence": 0.029241144066128433
+          },
+          "Oil": {
+            "predicted_price": 73.216,
+            "actual_price": 59.12,
+            "last_observed_price": 73.32,
+            "absolute_error": 14.096,
+            "normalized_error_percent": 19.226,
+            "confidence": 0.018636815106661125
+          },
+          "S&P 500": {
+            "predicted_price": 5918.41,
+            "actual_price": 6966.28,
+            "last_observed_price": 5918.25,
+            "absolute_error": 1047.87,
+            "normalized_error_percent": 17.706,
+            "confidence": 0.11782858769869659
+          }
+        }
+      }
+    },
+    "aggregate": {
+      "weekly": {
+        "Gold": {
+          "mean_error_percent": 1.976,
+          "std_error_percent": 0.864,
+          "num_evaluations": 3
+        },
+        "Bitcoin": {
+          "mean_error_percent": 11.529,
+          "std_error_percent": 7.042,
+          "num_evaluations": 3
+        },
+        "Oil": {
+          "mean_error_percent": 5.315,
+          "std_error_percent": 2.771,
+          "num_evaluations": 3
+        },
+        "S&P 500": {
+          "mean_error_percent": 1.028,
+          "std_error_percent": 0.623,
+          "num_evaluations": 3
+        }
+      },
+      "monthly": {
+        "Gold": {
+          "mean_error_percent": 2.665,
+          "std_error_percent": 3.502,
+          "num_evaluations": 3
+        },
+        "Bitcoin": {
+          "mean_error_percent": 9.246,
+          "std_error_percent": 11.185,
+          "num_evaluations": 3
+        },
+        "Oil": {
+          "mean_error_percent": 5.097,
+          "std_error_percent": 2.196,
+          "num_evaluations": 3
+        },
+        "S&P 500": {
+          "mean_error_percent": 3.682,
+          "std_error_percent": 1.371,
+          "num_evaluations": 3
+        }
+      },
+      "yearly": {
+        "Gold": {
+          "mean_error_percent": 36.111,
+          "std_error_percent": 24.885,
+          "num_evaluations": 3
+        },
+        "Bitcoin": {
+          "mean_error_percent": 91.955,
+          "std_error_percent": 66.869,
+          "num_evaluations": 3
+        },
+        "Oil": {
+          "mean_error_percent": 8.862,
+          "std_error_percent": 7.381,
+          "num_evaluations": 3
+        },
+        "S&P 500": {
+          "mean_error_percent": 21.16,
+          "std_error_percent": 2.535,
+          "num_evaluations": 3
+        }
+      }
+    }
+  }
+}

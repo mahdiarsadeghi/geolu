@@ -1,0 +1,10 @@
+Algorithm,Window,Prediction_Scale,Gold_Error_%,Bitcoin_Error_%,Oil_Error_%,Stock_Error_%
+Bachata,4y-3y,weekly,1.91%,21.3%,7.06%,1.84%
+Bachata,4y-3y,monthly,0.321%,25.1%,3.62%,4.14%
+Bachata,4y-3y,yearly,8.02%,167%,4.75%,22.1%
+Bachata,4y-2y,weekly,0.953%,8.33%,1.4%,0.93%
+Bachata,4y-2y,monthly,0.06%,1.11%,8.2%,5.08%
+Bachata,4y-2y,yearly,31.8%,104%,2.61%,23.7%
+Bachata,4y-1y,weekly,3.07%,4.96%,7.48%,0.319%
+Bachata,4y-1y,monthly,7.62%,1.56%,3.47%,1.82%
+Bachata,4y-1y,yearly,68.5%,4.77%,19.2%,17.7%

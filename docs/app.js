@@ -27,6 +27,7 @@ async function loadData() {
         createHistoricalChart(data, currentPeriod);
         createPredictionsChart(data, currentPeriod);
         setupTabListeners();
+        loadEvaluationResults();
     } catch (error) {
         console.error('Error loading data:', error);
     }
@@ -509,6 +510,99 @@ function formatDate(dateStr) {
         day: 'numeric',
         year: 'numeric'
     });
+}
+
+// Load evaluation results from CSV
+async function loadEvaluationResults() {
+    try {
+        console.log('Loading evaluation results...');
+        const response = await fetch('results.csv');
+        if (!response.ok) {
+            console.warn('Could not load evaluation results');
+            return;
+        }
+        
+        const csvText = await response.text();
+        const lines = csvText.trim().split('\n');
+        
+        // Skip header
+        const dataLines = lines.slice(1);
+        
+        // Parse CSV and calculate weighted averages per index per time scale
+        const results = {
+            'Gold': { 'weekly': [], 'monthly': [], 'yearly': [] },
+            'Bitcoin': { 'weekly': [], 'monthly': [], 'yearly': [] },
+            'Oil': { 'weekly': [], 'monthly': [], 'yearly': [] },
+            'S&P 500': { 'weekly': [], 'monthly': [], 'yearly': [] }
+        };
+        
+        dataLines.forEach(line => {
+            const parts = line.split(',');
+            if (parts.length >= 7) {
+                const window = parts[1]; // Window (e.g., "4y-3y", "4y-2y", "4y-1y")
+                const scale = parts[2]; // Prediction_Scale
+                const goldError = parts[3]; // Gold_Error_%
+                const bitcoinError = parts[4]; // Bitcoin_Error_%
+                const oilError = parts[5]; // Oil_Error_%
+                const stockError = parts[6]; // Stock_Error_%
+                
+                // Determine weight based on training data duration
+                let weight = 1;
+                if (window === '4y-3y') weight = 1; // 1 year of training data
+                else if (window === '4y-2y') weight = 2; // 2 years of training data
+                else if (window === '4y-1y') weight = 3; // 3 years of training data
+                
+                // Extract numeric value from percentage string (e.g., "1.91%" -> 1.91)
+                const parseError = (str) => {
+                    if (!str) return null;
+                    const num = parseFloat(str.replace('%', ''));
+                    return isNaN(num) ? null : num;
+                };
+                
+                const goldVal = parseError(goldError);
+                const bitcoinVal = parseError(bitcoinError);
+                const oilVal = parseError(oilError);
+                const stockVal = parseError(stockError);
+                
+                // Store value with weight as [value, weight]
+                if (goldVal !== null) results['Gold'][scale].push([goldVal, weight]);
+                if (bitcoinVal !== null) results['Bitcoin'][scale].push([bitcoinVal, weight]);
+                if (oilVal !== null) results['Oil'][scale].push([oilVal, weight]);
+                if (stockVal !== null) results['S&P 500'][scale].push([stockVal, weight]);
+            }
+        });
+        
+        // Calculate weighted averages and update table
+        const indices = ['Gold', 'Bitcoin', 'Oil', 'S&P 500'];
+        const scales = ['weekly', 'monthly', 'yearly'];
+        
+        indices.forEach(index => {
+            scales.forEach(scale => {
+                const data = results[index][scale];
+                if (data.length > 0) {
+                    // Calculate weighted average
+                    let weightedSum = 0;
+                    let totalWeight = 0;
+                    
+                    data.forEach(([value, weight]) => {
+                        weightedSum += value * weight;
+                        totalWeight += weight;
+                    });
+                    
+                    const weightedAvg = weightedSum / totalWeight;
+                    const cell = document.querySelector(`.acc-${scale}[data-index="${index}"]`);
+                    if (cell) {
+                        // Format to 3 significant figures
+                        cell.textContent = weightedAvg.toPrecision(3) + '%';
+                    }
+                }
+            });
+        });
+        
+        console.log('Evaluation results loaded successfully');
+    } catch (error) {
+        console.error('Error loading evaluation results:', error);
+    }
 }
 
 // Load data on page load

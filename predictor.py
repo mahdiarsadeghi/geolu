@@ -1,7 +1,6 @@
 """
 Geolu - Where Algorithms Predict Value
-Predicts gold prices weekly and logs predictions over time.
-Supports multiple models for comparison and accuracy evaluation.
+Numerical prediction system for Gold, Bitcoin, Oil, and Stock markets.
 
 Copyright (c) 2026 Geolu
 Licensed under Proprietary License with Educational Use
@@ -14,484 +13,301 @@ Commercial use requires permission from the copyright holder.
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-import yfinance as yf
-from sklearn.linear_model import LinearRegression, Ridge, Lasso
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from sklearn.svm import SVR
 import json
 import os
 import warnings
 import pytz
-from algorithms.Bachata import BachataPredictor
+import sys
+import shutil
+
+# Add evals directory to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'evals'))
+from rythm import DataManager
+
+# Import algorithms
+from algorithms.Bachata import predict_all_assets as bachata_predict
+
 warnings.filterwarnings('ignore')
 
 
-class GoldPricePredictor:
-    def __init__(self, log_file='predictions_log.json', web_data_file='docs/data.json'):
-        """Initialize the gold price predictor."""
+class MarketPredictor:
+    """Numerical prediction system for multiple market assets."""
+    
+    def __init__(self, 
+                 guess_file='guess.csv',
+                 log_file='predictions_log.json', 
+                 web_data_file='docs/data.json'):
+        """Initialize the market predictor."""
+        self.guess_file = guess_file
         self.log_file = log_file
         self.web_data_file = web_data_file
-        self.gold_ticker = 'GC=F'  # Gold futures
-        self.bitcoin_ticker = 'BTC-USD'  # Bitcoin
-        self.oil_ticker = 'CL=F'  # Crude Oil futures
-        self.sp500_ticker = '^GSPC'  # S&P 500
-        self.models = {}
-        self.predictions = {}
-    
-    def fetch_multiple_assets(self, period='2y'):
-        """Fetch historical data for multiple assets."""
-        print(f"Fetching market data for multiple assets...")
-        assets = {
-            'Gold': self.gold_ticker,
-            'Bitcoin': self.bitcoin_ticker,
-            'Oil': self.oil_ticker,
-            'S&P 500': self.sp500_ticker
+        
+        # Data manager for loading historical data
+        self.data_manager = DataManager()
+        
+        # Asset names
+        self.assets = ['Gold', 'Bitcoin', 'Oil', 'S&P 500']
+        
+        # Prediction periods
+        self.periods = {
+            'weekly': 7,
+            'monthly': 30,
+            'yearly': 365
         }
         
-        asset_data = {}
-        for name, ticker in assets.items():
-            try:
-                data = yf.download(ticker, period=period, progress=False)
-                if not data.empty:
-                    asset_data[name] = data
-                    print(f"  ✓ {name} data fetched")
-            except Exception as e:
-                print(f"  ✗ {name} data failed: {e}")
-        
-        return asset_data
-        
-    def fetch_gold_data(self, period='2y'):
-        """Fetch historical gold price data."""
-        print(f"Fetching gold price data for the past {period}...")
-        gold_data = yf.download(self.gold_ticker, period=period, progress=False)
-        return gold_data
-    
-    def create_features(self, df):
-        """Create features for prediction."""
-        df = df.copy()
-        
-        # Technical indicators
-        df['MA_7'] = df['Close'].rolling(window=7).mean()
-        df['MA_30'] = df['Close'].rolling(window=30).mean()
-        df['MA_90'] = df['Close'].rolling(window=90).mean()
-        df['Volatility'] = df['Close'].rolling(window=30).std()
-        df['Daily_Return'] = df['Close'].pct_change()
-        df['Price_Change'] = df['Close'].diff()
-        
-        # Momentum indicators
-        df['RSI'] = self.calculate_rsi(df['Close'])
-        
-        # Drop NaN values
-        df = df.dropna()
-        
-        return df
-    
-    def calculate_rsi(self, prices, period=14):
-        """Calculate Relative Strength Index."""
-        delta = prices.diff()
-        gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
-        loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
-        rs = gain / loss
-        rsi = 100 - (100 / (1 + rs))
-        return rsi
-    
-    def prepare_training_data(self, df):
-        """Prepare data for training."""
-        feature_columns = ['MA_7', 'MA_30', 'MA_90', 'Volatility', 
-                          'Daily_Return', 'Price_Change', 'RSI']
-        
-        X = df[feature_columns].values
-        y = df['Close'].values
-        
-        return X, y, feature_columns
-    
-    def initialize_models(self):
-        """Initialize multiple prediction models."""
-        self.models = {
-            'Random Forest': RandomForestRegressor(n_estimators=100, random_state=42, max_depth=10),
-            'Linear Regression': LinearRegression(),
-            'Ridge Regression': Ridge(alpha=1.0),
-            'Gradient Boosting': GradientBoostingRegressor(n_estimators=100, random_state=42),
-            'SVR': SVR(kernel='rbf', C=100, gamma=0.1)
+        # Algorithm registry
+        self.algorithms = {
+            'Bachata': bachata_predict
         }
     
-    def train_models(self):
-        """Train all prediction models."""
-        print("Training prediction models...")
+    def run_prediction(self):
+        """Run predictions for all assets using all algorithms."""
+        print("\n" + "="*70)
+        print("GEOLU MARKET PREDICTIONS")
+        print("="*70)
         
-        # Fetch data
-        gold_data = self.fetch_gold_data(period='2y')
-        
-        # Create features
-        df_features = self.create_features(gold_data)
-        
-        # Prepare training data
-        X, y, feature_columns = self.prepare_training_data(df_features)
-        
-        # Initialize models
-        self.initialize_models()
-        
-        # Train all models
-        for model_name, model in self.models.items():
-            model.fit(X, y)
-            print(f"  ✓ {model_name} trained")
-        
-        print("All models training completed!")
-        return df_features, feature_columns
-    
-    def predict_next_week(self):
-        """Make predictions for next week's gold price using all models."""
-        # Train models with latest data
-        df_features, feature_columns = self.train_models()
-        
-        # Get the most recent data point for prediction
-        latest_features = df_features.iloc[-1]
-        X_pred = latest_features[feature_columns].values.reshape(1, -1)
-        
-        # Get current price
-        current_price = df_features['Close'].iloc[-1]
-        
-        # Make predictions with all models
-        predictions = {}
-        for model_name, model in self.models.items():
-            pred_result = model.predict(X_pred)
-            # Extract scalar value from numpy array
-            predicted_price = float(pred_result.item() if hasattr(pred_result, 'item') else pred_result[0])
-            price_change_percent = ((predicted_price - current_price) / current_price) * 100
-            
-            predictions[model_name] = {
-                'predicted_price': predicted_price,
-                'price_change_percent': float(price_change_percent)
-            }
-        
-        # Get current time in New York timezone
+        # Get timezone
         ny_tz = pytz.timezone('America/New_York')
         now_ny = datetime.now(ny_tz)
+        timestamp = now_ny.strftime('%Y-%m-%d %H:%M:%S')
         
-        return {
-            'current_price': float(current_price),
-            'predictions': predictions,
-            'prediction_date': now_ny.strftime('%Y-%m-%d %H:%M:%S'),
-            'target_date': (now_ny + timedelta(days=7)).strftime('%Y-%m-%d'),
-            'historical_data': self.get_recent_historical_data(df_features)
-        }
-    
-    def get_recent_historical_data(self, df, days=30):
-        """Get recent historical data for visualization."""
-        recent_data = df.tail(days)[['Close']].copy()
-        return {
-            'dates': [d.strftime('%Y-%m-%d') for d in recent_data.index],
-            'prices': [float(p.item()) if hasattr(p, 'item') else float(p) for p in recent_data['Close'].values]
-        }
-    
-    def get_all_assets_historical_data(self, days=30):
-        """Get recent historical data for all assets."""
-        asset_data = self.fetch_multiple_assets(period='1y')
-        all_historical = {}
+        print(f"Prediction Time: {timestamp}\n")
         
-        for asset_name, data in asset_data.items():
-            if not data.empty:
-                recent_data = data.tail(days)[['Close']].copy()
-                all_historical[asset_name] = {
-                    'dates': [d.strftime('%Y-%m-%d') for d in recent_data.index],
-                    'prices': [float(p.item()) if hasattr(p, 'item') else float(p) for p in recent_data['Close'].values]
-                }
+        # Load historical data
+        print("Loading historical data...")
+        historical_data = self.data_manager.load_data()
+        print(f"  ✓ Loaded {len(historical_data)} data points from {historical_data.index[0].strftime('%Y-%m-%d')} to {historical_data.index[-1].strftime('%Y-%m-%d')}\n")
         
-        return all_historical
-    
-    def get_past_week_data(self):
-        """Get past week (7 days) of historical data for all assets."""
-        asset_data = self.fetch_multiple_assets(period='1mo')  # Fetch 1 month to ensure we have at least 7 days
-        week_historical = {}
+        # Get current prices
+        current_prices = {}
+        for asset in self.assets:
+            current_prices[asset] = float(historical_data[asset].iloc[-1])
+            print(f"  {asset}: ${current_prices[asset]:.2f}")
         
-        for asset_name, data in asset_data.items():
-            if not data.empty:
-                # Get last 7 trading days
-                week_data = data.tail(7)[['Close']].copy()
-                week_historical[asset_name] = {
-                    'dates': [d.strftime('%Y-%m-%d') for d in week_data.index],
-                    'prices': [float(p.item()) if hasattr(p, 'item') else float(p) for p in week_data['Close'].values]
-                }
+        print("\n" + "-"*70)
+        print("RUNNING ALGORITHMS")
+        print("-"*70 + "\n")
         
-        return week_historical
-    
-    def get_time_period_data(self, days, period):
-        """Get historical data for a specific time period for all assets."""
-        asset_data = self.fetch_multiple_assets(period=period)
-        period_historical = {}
-        
-        for asset_name, data in asset_data.items():
-            if not data.empty:
-                period_data = data.tail(days)[['Close']].copy()
-                period_historical[asset_name] = {
-                    'dates': [d.strftime('%Y-%m-%d') for d in period_data.index],
-                    'prices': [float(p.item()) if hasattr(p, 'item') else float(p) for p in period_data['Close'].values]
-                }
-        
-        return period_historical
-    
-    def generate_simple_predictions(self, historical_data, forecast_days):
-        """Generate simple smoothed predictions based on recent trends."""
-        predictions = {}
-        
-        for asset_name, data in historical_data.items():
-            if not data['prices']:
-                continue
+        # Run each algorithm
+        all_predictions = {}
+        for algo_name, algo_func in self.algorithms.items():
+            print(f"Running {algo_name}...")
+            
+            algo_predictions = {}
+            for period_name, forecast_days in self.periods.items():
+                print(f"  • {period_name} ({forecast_days} days)...")
                 
-            prices = data['prices']
-            # Calculate simple moving average trend
-            recent_avg = sum(prices[-min(5, len(prices)):]) / min(5, len(prices))
-            overall_avg = sum(prices) / len(prices)
-            trend = (recent_avg - overall_avg) / overall_avg
-            
-            # Generate smoothed predictions
-            last_price = prices[-1]
-            predicted_prices = []
-            for i in range(1, forecast_days + 1):
-                # Gentle trend continuation with dampening
-                predicted_change = trend * (1 - i / (forecast_days * 2))
-                predicted_price = last_price * (1 + predicted_change * 0.5)
-                predicted_prices.append(float(predicted_price))
-            
-            # Generate future dates
-            from datetime import datetime, timedelta
-            last_date = datetime.strptime(data['dates'][-1], '%Y-%m-%d')
-            predicted_dates = [(last_date + timedelta(days=i)).strftime('%Y-%m-%d') 
-                             for i in range(1, forecast_days + 1)]
-            
-            predictions[asset_name] = {
-                'dates': predicted_dates,
-                'prices': predicted_prices
-            }
-        
-        return predictions
-    
-    def generate_bachata_predictions(self) -> Dict[str, Dict]:
-        """
-        Generate predictions using the Bachata Fourier analysis algorithm.
-        
-        Returns:
-            Dictionary with predictions for all assets at different time scales
-        """
-        print("\nRunning Bachata Fourier Analysis...")
-        
-        # Fetch extended historical data for Bachata (5 years)
-        asset_data_5y = self.fetch_multiple_assets(period='5y')
-        
-        if not asset_data_5y:
-            print("  ✗ No data available for Bachata analysis")
-            return {}
-        
-        # Initialize Bachata predictor
-        bachata = BachataPredictor(window_months=6, lookback_years=5)
-        
-        try:
-            # Fit the model with all asset data
-            bachata.fit(asset_data_5y)
-            print("  ✓ Bachata model fitted")
-            
-            # Generate predictions for each asset at different time scales
-            all_predictions = {}
-            time_scales = {
-                'weekly': {'days': 7, 'points': 7, 'freq': 'D', 'label': 'daily'},      # 7 days (daily resolution)
-                'monthly': {'days': 28, 'points': 4, 'freq': '7D', 'label': 'weekly'},   # 4 weeks (weekly resolution)
-                'yearly': {'days': 365, 'points': 12, 'freq': '30D', 'label': 'monthly'} # 12 months (monthly resolution)
-            }
-            
-            for asset_name in ['Gold', 'Bitcoin', 'Oil', 'S&P 500']:
-                if asset_name not in asset_data_5y:
-                    continue
+                try:
+                    # Run algorithm
+                    results = algo_func(historical_data, forecast_days=forecast_days)
                     
-                asset_predictions = {}
-                
-                for scale_name, scale_config in time_scales.items():
-                    # Get full prediction for the period
-                    result = bachata.predict(asset_name, scale_config['days'])
-                    
-                    # Get current price
-                    current_price = float(asset_data_5y[asset_name]['Close'].iloc[-1])
-                    
-                    # Generate dates at the appropriate frequency
-                    last_date = asset_data_5y[asset_name].index[-1]
-                    future_dates = pd.date_range(
-                        start=last_date + timedelta(days=1),
-                        periods=scale_config['points'],
-                        freq=scale_config['freq']
-                    )
-                    
-                    # Sample predictions at the appropriate intervals
-                    predictions_array = result['predictions']
-                    if isinstance(predictions_array, np.ndarray) and len(predictions_array) > 0:
-                        # Sample at intervals to get the right number of points
-                        interval = len(predictions_array) // scale_config['points']
-                        if interval < 1:
-                            interval = 1
-                        sampled_predictions = predictions_array[::max(1, interval)][:scale_config['points']]
-                        
-                        # Predictions are price changes, apply them progressively
-                        # Start from current price and add cumulative changes
-                        predictions_with_base = np.zeros(scale_config['points'])
-                        predictions_with_base[0] = current_price + sampled_predictions[0]
-                        for i in range(1, scale_config['points']):
-                            predictions_with_base[i] = predictions_with_base[i-1] + sampled_predictions[i]
-                    else:
-                        predictions_with_base = np.full(scale_config['points'], current_price)
-                    
-                    asset_predictions[scale_name] = {
-                        'dates': [d.strftime('%Y-%m-%d') for d in future_dates],
-                        'prices': [float(p) for p in predictions_with_base],
-                        'confidence': float(result['confidence'][0]),
-                        'dominant_frequencies': result['dominant_frequencies'][:3],  # Top 3
-                        'resolution': scale_config['label']
+                    # Store results
+                    algo_predictions[period_name] = {
+                        'forecast_days': forecast_days,
+                        'results': results
                     }
                     
-                    print(f"  ✓ {asset_name} {scale_name} predictions generated ({scale_config['points']} {scale_config['label']} points, confidence: {result['confidence'][0]:.2f})")
+                    # Print summary
+                    for asset in self.assets:
+                        if asset in results:
+                            final_price = results[asset]['prices'][-1]
+                            change_pct = ((final_price - current_prices[asset]) / current_prices[asset]) * 100
+                            conf = results[asset]['confidence']
+                            print(f"    {asset}: ${final_price:.2f} ({change_pct:+.2f}%, confidence: {conf:.2f})")
                 
-                all_predictions[asset_name] = asset_predictions
+                except Exception as e:
+                    print(f"    ✗ {algo_name} {period_name} failed: {e}")
+                    import traceback
+                    traceback.print_exc()
             
-            return all_predictions
-            
-        except Exception as e:
-            print(f"  ✗ Bachata prediction failed: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            return {}
-    
-    def log_prediction(self, prediction):
-        """Log the prediction to a JSON file."""
-        # Load existing predictions
-        if os.path.exists(self.log_file):
-            with open(self.log_file, 'r') as f:
-                predictions = json.load(f)
-        else:
-            predictions = []
+            all_predictions[algo_name] = algo_predictions
+            print()
         
-        # Add new prediction
-        predictions.append(prediction)
+        # Save predictions to guess.csv
+        self.save_guess_csv(all_predictions, current_prices, timestamp)
         
-        # Save updated predictions
-        with open(self.log_file, 'w') as f:
-            json.dump(predictions, f, indent=2)
+        # Log prediction
+        self.log_prediction(all_predictions, current_prices, timestamp)
         
-        print(f"Prediction logged to {self.log_file}")
-    
-    def get_prediction_history(self):
-        """Retrieve prediction history."""
-        if os.path.exists(self.log_file):
-            with open(self.log_file, 'r') as f:
-                return json.load(f)
-        return []
-    
-    def display_prediction(self, prediction):
-        """Display prediction in a formatted way."""
-        print("\n" + "="*70)
-        print("GOLD PRICE PREDICTIONS - MULTI-MODEL COMPARISON")
+        # Export for web
+        self.export_web_data(all_predictions, current_prices, historical_data, timestamp)
+        
         print("="*70)
-        print(f"Prediction Date: {prediction['prediction_date']}")
-        print(f"Target Date: {prediction['target_date']}")
-        print(f"Current Price: ${prediction['current_price']:.2f}")
-        print("-"*70)
-        print(f"{'Model':<25} {'Predicted Price':>15} {'Change':>12}")
-        print("-"*70)
-        
-        for model_name, pred in prediction['predictions'].items():
-            print(f"{model_name:<25} ${pred['predicted_price']:>14.2f} {pred['price_change_percent']:>11.2f}%")
-        
+        print("PREDICTION COMPLETE")
         print("="*70 + "\n")
+        
+        return all_predictions
     
-    def export_web_data(self, prediction):
+    def save_guess_csv(self, predictions, current_prices, timestamp):
+        """
+        Save predictions to guess.csv in structured format.
+        
+        Format: Algorithm, Asset, Period, Days, Current_Price, Predicted_Price, Change_%, Confidence
+        """
+        rows = []
+        
+        for algo_name, algo_predictions in predictions.items():
+            for period_name, period_data in algo_predictions.items():
+                forecast_days = period_data['forecast_days']
+                results = period_data['results']
+                
+                for asset in self.assets:
+                    if asset in results:
+                        current = current_prices[asset]
+                        predicted = results[asset]['prices'][-1]
+                        change_pct = ((predicted - current) / current) * 100
+                        confidence = results[asset]['confidence']
+                        
+                        rows.append({
+                            'Timestamp': timestamp,
+                            'Algorithm': algo_name,
+                            'Asset': asset,
+                            'Period': period_name,
+                            'Forecast_Days': forecast_days,
+                            'Current_Price': round(current, 3),
+                            'Predicted_Price': round(predicted, 3),
+                            'Change_Percent': round(change_pct, 3),
+                            'Confidence': round(confidence, 3)
+                        })
+        
+        # Create DataFrame
+        df = pd.DataFrame(rows)
+        
+        # Append to existing guess.csv if it exists
+        if os.path.exists(self.guess_file):
+            df_existing = pd.read_csv(self.guess_file)
+            df = pd.concat([df_existing, df], ignore_index=True)
+        
+        # Save
+        df.to_csv(self.guess_file, index=False)
+        print(f"✓ Predictions saved to {self.guess_file}")
+    
+    def log_prediction(self, predictions, current_prices, timestamp):
+        """Log prediction to predictions_log.json."""
+        # Load existing log
+        if os.path.exists(self.log_file):
+            with open(self.log_file, 'r') as f:
+                log = json.load(f)
+        else:
+            log = []
+        
+        # Create log entry
+        entry = {
+            'timestamp': timestamp,
+            'current_prices': current_prices,
+            'predictions': {}
+        }
+        
+        for algo_name, algo_predictions in predictions.items():
+            entry['predictions'][algo_name] = {}
+            for period_name, period_data in algo_predictions.items():
+                entry['predictions'][algo_name][period_name] = {
+                    'forecast_days': period_data['forecast_days'],
+                    'results': period_data['results']
+                }
+        
+        log.append(entry)
+        
+        # Save
+        with open(self.log_file, 'w') as f:
+            json.dump(log, f, indent=2)
+        
+        print(f"✓ Prediction logged to {self.log_file}")
+    
+    def export_web_data(self, predictions, current_prices, historical_data, timestamp):
         """Export data for web visualization."""
         # Ensure docs directory exists
         os.makedirs(os.path.dirname(self.web_data_file), exist_ok=True)
         
-        # Get historical data for all assets (30 days for context)
-        all_assets_historical = self.get_all_assets_historical_data(days=30)
+        # Prepare historical data for different time periods
+        time_periods = {
+            'weekly': historical_data.tail(7),
+            'monthly': historical_data.tail(30),
+            'yearly': historical_data.tail(365)
+        }
         
-        # Get data for different time periods
-        weekly_data = self.get_time_period_data(days=7, period='1mo')
-        monthly_data = self.get_time_period_data(days=30, period='3mo')
-        yearly_data = self.get_time_period_data(days=365, period='2y')
+        time_periods_for_web = {}
+        for period_name, period_data in time_periods.items():
+            time_periods_for_web[period_name] = {}
+            for asset in self.assets:
+                # Handle both 'S&P 500' and 'Stock' column names
+                col_name = asset if asset in period_data.columns else 'Stock' if asset == 'S&P 500' else asset
+                if col_name in period_data.columns:
+                    time_periods_for_web[period_name][asset] = {
+                        'dates': [d.strftime('%Y-%m-%d') for d in period_data.index],
+                        'prices': [float(p) for p in period_data[col_name].values]
+                    }
         
-        # Generate simple baseline predictions
-        weekly_predictions = self.generate_simple_predictions(weekly_data, forecast_days=7)
-        monthly_predictions = self.generate_simple_predictions(monthly_data, forecast_days=30)
-        yearly_predictions = self.generate_simple_predictions(yearly_data, forecast_days=365)
+        # Prepare predictions for web (restructured for Bachata format)
+        # Frontend expects: {Gold: {weekly: {...}, monthly: {...}}, Bitcoin: {...}}
+        bachata_predictions = {}
+        for asset in self.assets:
+            bachata_predictions[asset] = {}
         
-        # Generate Bachata algorithm predictions
-        bachata_predictions = self.generate_bachata_predictions()
+        for algo_name, algo_predictions in predictions.items():
+            for period_name, period_data in algo_predictions.items():
+                # Generate future dates
+                last_date = historical_data.index[-1]
+                forecast_days = period_data['forecast_days']
+                future_dates = pd.date_range(
+                    start=last_date + timedelta(days=1),
+                    periods=forecast_days,
+                    freq='D'
+                )
+                
+                for asset in self.assets:
+                    # Check both asset name and 'Stock' for S&P 500
+                    result_key = asset
+                    if asset == 'S&P 500' and asset not in period_data['results']:
+                        result_key = 'Stock' if 'Stock' in period_data['results'] else None
+                    
+                    if result_key and result_key in period_data['results']:
+                        bachata_predictions[asset][period_name] = {
+                            'dates': [d.strftime('%Y-%m-%d') for d in future_dates],
+                            'prices': period_data['results'][result_key]['prices'],
+                            'confidence': period_data['results'][result_key]['confidence']
+                        }
         
-        # Prepare web data
+        # Create web data structure
         web_data = {
-            'last_updated': prediction['prediction_date'],
-            'current_price': prediction['current_price'],
-            'target_date': prediction['target_date'],
-            'historical': prediction['historical_data'],
-            'all_assets': all_assets_historical,
-            'past_week': weekly_data,  # Keep for backward compatibility
-            'time_periods': {
-                'weekly': weekly_data,
-                'monthly': monthly_data,
-                'yearly': yearly_data
-            },
-            'predictions_data': {
-                'weekly': weekly_predictions,
-                'monthly': monthly_predictions,
-                'yearly': yearly_predictions
-            },
-            'bachata_predictions': bachata_predictions,  # Advanced Fourier predictions
-            'predictions': prediction['predictions'],
+            'last_updated': timestamp,
+            'current_prices': current_prices,
+            'time_periods': time_periods_for_web,
+            'bachata_predictions': bachata_predictions,
             'prediction_history': self.get_prediction_history()
         }
         
-        # Save web data
+        # Save
         with open(self.web_data_file, 'w') as f:
             json.dump(web_data, f, indent=2)
         
-        print(f"Web data exported to {self.web_data_file}")
+        print(f"✓ Web data exported to {self.web_data_file}")
+        
+        # Copy evaluation results if available
+        eval_results_path = os.path.join('evals', 'results.csv')
+        if os.path.exists(eval_results_path):
+            dest_path = os.path.join('docs', 'results.csv')
+            shutil.copy2(eval_results_path, dest_path)
+            print(f"✓ Evaluation results copied to {dest_path}")
+        
+        # Copy guess.csv if available
+        if os.path.exists(self.guess_file):
+            dest_path = os.path.join('docs', 'guess.csv')
+            shutil.copy2(self.guess_file, dest_path)
+            print(f"✓ Predictions (guess.csv) copied to {dest_path}")
     
-    def run_weekly_prediction(self):
-        """Run the weekly prediction routine."""
-        print("Starting Gold Price Weekly Prediction...")
-        print(f"Current Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-        
-        # Make predictions with all models
-        prediction = self.predict_next_week()
-        
-        # Display predictions
-        self.display_prediction(prediction)
-        
-        # Log prediction
-        self.log_prediction(prediction)
-        
-        # Export data for web visualization
-        self.export_web_data(prediction)
-        
-        # Show prediction count
-        history = self.get_prediction_history()
-        print(f"Total predictions logged: {len(history)}")
-        
-        return prediction
+    def get_prediction_history(self):
+        """Get prediction history from log file."""
+        if os.path.exists(self.log_file):
+            with open(self.log_file, 'r') as f:
+                return json.load(f)
+        return []
 
 
 def main():
-    """Main function to run the predictor."""
-    predictor = GoldPricePredictor()
-    predictor.run_weekly_prediction()
-    
-    # Display recent prediction history
-    history = predictor.get_prediction_history()
-    if len(history) > 1:
-        print("\nRecent Prediction History (Last 3):")
-        print("-" * 70)
-        for pred in history[-3:]:
-            print(f"\n{pred['prediction_date']} | Target: {pred['target_date']}")
-            print(f"Current Price: ${pred['current_price']:.2f}")
-            if 'predictions' in pred:
-                for model, data in pred['predictions'].items():
-                    print(f"  {model}: ${data['predicted_price']:.2f} ({data['price_change_percent']:+.2f}%)")
-            else:
-                # Legacy format support
-                print(f"  Predicted: ${pred.get('predicted_price', 0):.2f} ({pred.get('price_change_percent', 0):+.2f}%)")
+    """Main function to run predictions."""
+    predictor = MarketPredictor()
+    predictor.run_prediction()
 
 
 if __name__ == "__main__":

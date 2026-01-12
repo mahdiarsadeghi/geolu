@@ -49,13 +49,13 @@
         </section>
 
         <section class="accuracy-section">
-            <h2>Predictive Algorithm Evaluation</h2>
+            <h2>Evaluations</h2>
             <div class="performance-table-container">
                 <table class="performance-table">
                     <thead>
                         <tr>
-                            <th rowspan="2">Algorithm</th>
-                            <th colspan="3">Accuracy</th>
+                            <th rowspan="2">Index</th>
+                            <th colspan="3">Prediction Error</th>
                         </tr>
                         <tr>
                             <th class="time-period" data-period="weekly">Weekly</th>
@@ -65,34 +65,28 @@
                     </thead>
                     <tbody id="performance-tbody">
                         <tr>
-                            <td><button class="algorithm-button" data-algo="trend">Trend Analysis</button></td>
-                            <td class="acc-weekly">85.2%</td>
-                            <td class="acc-monthly">78.4%</td>
-                            <td class="acc-yearly">71.6%</td>
+                            <td>Gold</td>
+                            <td class="acc-weekly" data-index="Gold">—</td>
+                            <td class="acc-monthly" data-index="Gold">—</td>
+                            <td class="acc-yearly" data-index="Gold">—</td>
                         </tr>
                         <tr>
-                            <td><button class="algorithm-button" data-algo="ma">Moving Average</button></td>
-                            <td class="acc-weekly">82.7%</td>
-                            <td class="acc-monthly">80.1%</td>
-                            <td class="acc-yearly">74.3%</td>
+                            <td>Bitcoin</td>
+                            <td class="acc-weekly" data-index="Bitcoin">—</td>
+                            <td class="acc-monthly" data-index="Bitcoin">—</td>
+                            <td class="acc-yearly" data-index="Bitcoin">—</td>
                         </tr>
                         <tr>
-                            <td><button class="algorithm-button" data-algo="momentum">Momentum Analysis</button></td>
-                            <td class="acc-weekly">79.5%</td>
-                            <td class="acc-monthly">76.8%</td>
-                            <td class="acc-yearly">69.2%</td>
+                            <td>Oil</td>
+                            <td class="acc-weekly" data-index="Oil">—</td>
+                            <td class="acc-monthly" data-index="Oil">—</td>
+                            <td class="acc-yearly" data-index="Oil">—</td>
                         </tr>
                         <tr>
-                            <td><button class="algorithm-button" data-algo="pattern">Pattern Recognition</button></td>
-                            <td class="acc-weekly">88.1%</td>
-                            <td class="acc-monthly">82.3%</td>
-                            <td class="acc-yearly">76.9%</td>
-                        </tr>
-                        <tr>
-                            <td><button class="algorithm-button" data-algo="ensemble">Ensemble Model</button></td>
-                            <td class="acc-weekly">91.4%</td>
-                            <td class="acc-monthly">86.7%</td>
-                            <td class="acc-yearly">79.5%</td>
+                            <td>S&P 500</td>
+                            <td class="acc-weekly" data-index="S&P 500">—</td>
+                            <td class="acc-monthly" data-index="S&P 500">—</td>
+                            <td class="acc-yearly" data-index="S&P 500">—</td>
                         </tr>
                     </tbody>
                 </table>
@@ -100,7 +94,7 @@
         </section>
 
         <footer>
-            <p>&copy; mahdiar</p>
+            <p>&copy; geolu</p>
             <p><a href="https://github.com/mahdiarsadeghi/geolu/blob/main/LICENSE" target="_blank">License</a></p>
         </footer>
     </div>
