@@ -1,44 +1,35 @@
 # Geolu
 *Where Algorithms Predict Value*
 
-##  Live Dashboard
+## Live dashboard
 
-**Access real-time market predictions:** [https://mahdiarsadeghi.github.io/geolu/](https://mahdiarsadeghi.github.io/geolu/)
+[Open the dashboard](https://mahdiarsadeghi.github.io/geolu/)
 
 ## Overview
 
-Geolu is a sophisticated financial market oracle that delivers data-driven predictions across multiple asset classes. Through proprietary algorithms and advanced evaluation methodologies, the platform provides actionable insights into future market movements for Gold, Oil, Bitcoin, and S&P 500.
+Geolu is an experimental forecasting system for Gold, Oil, Bitcoin, and the S&P 500. It reads historical price data, applies the Bachata multi-scale Fourier model, evaluates forecasts on chronological holdout windows, and exports data for the dashboard.
 
-## What Geolu Does
+## What it does
 
-**Real-Time Market Intelligence**
-- Live tracking and visualization of historical price movements across major financial assets
-- Interactive charts with weekly, monthly, and yearly timeframes
-- Instant updates synced with market data
+- Tracks and visualizes historical prices across four assets.
+- Produces weekly, monthly, and yearly forecasts.
+- Evaluates predictions with normalized errors across rolling historical windows.
 
-**Predictive Analytics**
-- Customized algorithms analyze market trends and generate forward-looking forecasts
-- Multi-asset predictions spanning days to months ahead
-- Proprietary evaluation methods ensure prediction reliability and continuous improvement
+## Run locally
 
-## Future Features
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python predictor.py
+```
 
-Geolu is evolving into a comprehensive prediction platform. Upcoming capabilities include:
+The workflow entry point is `predictor.py`. It writes prediction history and dashboard data to the tracked CSV, JSON, and `docs/` outputs.
 
-- **Enhanced Prediction Models**: Advanced algorithms with higher accuracy and longer forecast horizons
-- **Subscription Tiers**: Access to premium prediction features, extended forecasts, and confidence intervals
-- **Risk Analysis**: Volatility forecasts and downside risk assessments
-- **Alert System**: Customizable notifications for significant predicted movements
-- **Portfolio Optimization**: AI-driven allocation recommendations across tracked assets
+## Limitations
 
-## Disclaimer
-
-Geolu provides predictive analytics based on historical data and quantitative models. All predictions carry inherent uncertainty. Past performance does not guarantee future results. This platform should inform, not replace, professional financial advice. Users are responsible for their own investment decisions.
+This is an experimental quantitative model. Forecasts carry uncertainty and should be compared with simple baselines before being used for decisions. The repository's evaluation results are historical experiments, not financial advice.
 
 ## License
 
-Proprietary algorithms and predictive methodologies. Educational and personal use permitted. Commercial use requires authorization.
-
----
-
-**Geolu** - Where Algorithms Predict Value
+Proprietary algorithms and predictive methodologies. Educational and personal use permitted. Commercial use requires permission from the copyright holder.
